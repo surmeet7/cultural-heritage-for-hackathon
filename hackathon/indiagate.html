@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>India Gate - Cultural Heritage</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+    :root {
+      --container-color: rgba(255, 255, 255, 0.08);
+      --backdrop-blur: blur(10px);
+      --title-color: #FFA726;
+      --text-color: rgba(255, 255, 255, 0.9);
+      --accent-color: #FFA726;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #5a2a7b, #7b1fa2);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .bg-hero {
+      position: fixed;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1587474260584-136574528ed5');
+      background-size: cover;
+      background-position: center;
+      filter: blur(6px) brightness(0.45);
+      z-index: -2;
+    }
+
+    .overlay-gradient {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.6));
+      z-index: -1;
+    }
+
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(255, 167, 38, 0.1) 0%, transparent 25%),
+                  radial-gradient(circle at 80% 70%, rgba(101, 31, 255, 0.1) 0%, transparent 25%);
+      z-index: -1;
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+
+    .glass {
+      background: var(--container-color);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-color);
+    }
+
+    .header {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    .main-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--title-color);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .main-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .parallax-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      padding: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      background: var(--container-color);
+      backdrop-filter: var(--backdrop-blur);
+    }
+
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(-5px);
+    }
+
+    .floating-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--container-color);
+      padding: 10px 16px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--text-color);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      backdrop-filter: var(--backdrop-blur);
+      z-index: 10;
+    }
+
+    .floating-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    article.glass img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      object-fit: cover;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    article.glass img:hover {
+      transform: scale(1.02);
+    }
+
+    h2 {
+      color: var(--title-color);
+      margin: 1.5rem 0 1rem;
+      font-size: 1.8rem;
+      position: relative;
+      padding-bottom: 8px;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
+
+    h3 {
+      color: var(--text-color);
+      margin: 1.2rem 0 0.8rem;
+      font-size: 1.4rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    li::before {
+      content: '•';
+      color: var(--accent-color);
+      font-weight: bold;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1em;
+    }
+
+    hr {
+      border-color: rgba(255, 255, 255, 0.1);
+      margin: 1.5rem 0;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      opacity: 0.95;
+    }
+
+    strong {
+      color: var(--title-color);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .main-title {
+        font-size: 2rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      .container {
+        padding: 1rem;
+      }
+      .glass {
+        padding: 1.5rem;
+      }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .parallax-section, article.glass {
+      animation: fadeIn 1s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-hero" aria-hidden="true"></div>
+  <div class="overlay-gradient" aria-hidden="true"></div>
+  <div class="bg-pattern"></div>
+
+  <a class="floating-btn" href="index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    Main
+  </a>
+
+  <header class="parallax-section">
+    <div class="glass" style="max-width: 820px; text-align: center;">
+      <h1 class="main-title">India Gate</h1>
+      <p class="subtitle">A symbol of national pride and sacrifice</p>
+      <a class="back-link" href="index.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to main
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="glass">
+      <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5" alt="India Gate at night" style="height: 400px;">
+
+      <h2>🇮🇳 India Gate: Full Details</h2>
+      <p>Learn about India Gate's design by Sir Edwin Lutyens, its role as the All India War Memorial, and the Amar Jawan Jyoti commemoration. This page outlines the structure's dimensions, inscriptions, ceremonial uses, and its place in Delhi's ceremonial axis and public life.</p>
+
+      <h3>🏛️ Overview</h3>
+      <ul>
+        <li><strong>Location:</strong> Eastern end of Kartavya Path (formerly Rajpath), New Delhi</li>
+        <li><strong>Height:</strong> 42 meters (138 feet)</li>
+        <li><strong>Architect:</strong> Sir Edwin Lutyens</li>
+        <li><strong>Design Style:</strong> Inspired by Roman triumphal arches, similar to the Arc de Triomphe in Paris</li>
+        <li><strong>Material:</strong> Yellow and red sandstone</li>
+      </ul>
+
+      <hr>
+
+      <h3>📜 Historical Significance</h3>
+      <ul>
+        <li><strong>Original Name:</strong> All India War Memorial</li>
+        <li><strong>Foundation Stone Laid:</strong> 10 February 1921 by the Duke of Connaught</li>
+        <li><strong>Unveiled:</strong> 12 February 1931</li>
+        <li><strong>Purpose:</strong> Commemorates 74,187 soldiers of the British Indian Army who died in World War I (1914-1919) and the Third Anglo-Afghan War</li>
+      </ul>
+
+      <hr>
+
+      <h3>🔥 Amar Jawan Jyoti</h3>
+      <ul>
+        <li><strong>Established:</strong> 1972, after the Bangladesh Liberation War</li>
+        <li><strong>Structure:</strong> Black marble plinth with a reversed rifle topped by a war helmet, surrounded by four eternal flames</li>
+        <li><strong>Symbolism:</strong> Honors the unknown soldiers who died in the 1971 Indo-Pakistan War</li>
+        <li><strong>Ceremonial Role:</strong> The Prime Minister pays tribute here every Republic Day before the parade begins</li>
+      </ul>
+
+      <hr>
+
+      <h3>📍 Architectural Features</h3>
+      <ul>
+        <li><strong>Span:</strong> 9.1 meters across the main arch</li>
+        <li><strong>Engraved Names:</strong> Over 13,300 names of soldiers, including some British officers</li>
+        <li><strong>Surroundings:</strong> Located on the ceremonial axis of New Delhi, part of the central vista redevelopment</li>
+      </ul>
+
+      <hr>
+
+      <h3>🌆 Cultural & Civic Importance</h3>
+      <ul>
+        <li><strong>Tourist Attraction:</strong> A popular spot for locals and tourists, especially in the evenings when it's beautifully lit</li>
+        <li><strong>Protest Site:</strong> Often used for peaceful demonstrations and civil society gatherings</li>
+        <li><strong>Symbol of National Pride:</strong> Represents sacrifice, valor, and unity</li>
+      </ul>
+
+      <hr>
+
+      <h3>📸 Fun Fact</h3>
+      <p>At sunset, India Gate is illuminated from <strong>7:00 PM to 9:30 PM</strong>, creating a stunning visual that draws visitors from around the world.</p>
+    </article>
+  </main>
+</body>
+</html>

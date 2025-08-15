@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kaziranga National Park - Cultural Heritage</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+    :root {
+      --container-color: rgba(255, 255, 255, 0.08);
+      --backdrop-blur: blur(10px);
+      --title-color: #8BC34A;
+      --text-color: rgba(255, 255, 255, 0.9);
+      --accent-color: #8BC34A;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #1b5e20, #2e7d32);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .bg-hero {
+      position: fixed;
+      inset: 0;
+      background-image: url('https://rhinos.org/wp-content/uploads/2024/07/1720542345016.jpeg');
+      background-size: cover;
+      background-position: center;
+      filter: blur(6px) brightness(0.45);
+      z-index: -2;
+    }
+
+    .overlay-gradient {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.6));
+      z-index: -1;
+    }
+
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(139, 195, 74, 0.1) 0%, transparent 25%),
+                  radial-gradient(circle at 80% 70%, rgba(46, 125, 50, 0.1) 0%, transparent 25%);
+      z-index: -1;
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+
+    .glass {
+      background: var(--container-color);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-color);
+    }
+
+    .main-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--title-color);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .main-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .parallax-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      padding: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      background: var(--container-color);
+      backdrop-filter: var(--backdrop-blur);
+    }
+
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(-5px);
+    }
+
+    .floating-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--container-color);
+      padding: 10px 16px;
+      border-radius: 50px;
+      text-decoration: none;
+      color: var(--text-color);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      backdrop-filter: var(--backdrop-blur);
+      z-index: 10;
+    }
+
+    .floating-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    article.glass img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      object-fit: cover;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+      height: 400px;
+    }
+
+    article.glass img:hover {
+      transform: scale(1.02);
+    }
+
+    h2 {
+      color: var(--title-color);
+      margin: 1.5rem 0 1rem;
+      font-size: 1.8rem;
+      position: relative;
+      padding-bottom: 8px;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
+
+    h3 {
+      color: var(--text-color);
+      margin: 1.2rem 0 0.8rem;
+      font-size: 1.4rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    li::before {
+      content: '•';
+      color: var(--accent-color);
+      font-weight: bold;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1em;
+    }
+
+    hr {
+      border-color: rgba(255, 255, 255, 0.1);
+      margin: 1.5rem 0;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      opacity: 0.95;
+    }
+
+    strong {
+      color: var(--title-color);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .main-title {
+        font-size: 2rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      .container {
+        padding: 1rem;
+      }
+      .glass {
+        padding: 1.5rem;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .parallax-section, article.glass {
+      animation: fadeIn 1s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Elements -->
+  <div class="bg-hero" aria-hidden="true"></div>
+  <div class="overlay-gradient" aria-hidden="true"></div>
+  <div class="bg-pattern"></div>
+
+  <!-- Floating Home Button -->
+  <a class="floating-btn" href="index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+    </svg>
+    Main
+  </a>
+
+  <!-- Header Section -->
+  <header class="parallax-section">
+    <div class="glass" style="max-width: 820px; text-align: center;">
+      <h1 class="main-title">Kaziranga National Park</h1>
+      <p class="subtitle">A UNESCO World Heritage Site famed for one-horned rhinos, wetlands and biodiversity</p>
+      <a class="back-link" href="index.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to main
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <article class="glass">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Rhino_in_Kaziranga.jpg" alt="One-horned rhino in Kaziranga National Park">
+
+      <h2>🦏 Kaziranga: Full Details</h2>
+      <p>Kaziranga National Park protects the largest population of the Indian one-horned rhinoceros and a mosaic of floodplain grasslands, marshes and dense tropical forests. This page summarizes its ecology, conservation history, and visitor information.</p>
+
+      <h3>📍 Overview</h3>
+      <ul>
+        <li><strong>Location:</strong> Golaghat & Nagaon districts, Assam, India</li>
+        <li><strong>Established:</strong> 1905 (wildlife sanctuary), 1974 (national park)</li>
+        <li><strong>UNESCO:</strong> Inscribed as a World Heritage Site in 1985</li>
+        <li><strong>Area:</strong> Approx. 430 sq km</li>
+      </ul>
+
+      <hr>
+
+      <h3>🌿 Ecology & Wildlife</h3>
+      <ul>
+        <li><strong>Flagship species:</strong> Indian one-horned rhinoceros (Rhinoceros unicornis)</li>
+        <li><strong>Other mammals:</strong> Asian elephant, Bengal tiger, wild water buffalo, swamp deer</li>
+        <li><strong>Birds:</strong> Important wetlands for migratory waterfowl and resident grassland birds</li>
+      </ul>
+
+      <hr>
+
+      <h3>🏛 Conservation History</h3>
+      <ul>
+        <li><strong>Anti-poaching:</strong> Intensive protection and community engagement have helped rhino recovery</li>
+        <li><strong>Habitat:</strong> Annual flooding by the Brahmaputra shapes the park's grassland and wetland habitats</li>
+        <li><strong>Community:</strong> Local communities are active in sustainable tourism and conservation programs</li>
+      </ul>
+
+      <hr>
+
+      <h3>🧭 Visitor Information</h3>
+      <ul>
+        <li><strong>Best time to visit:</strong> November to April (dry season)</li>
+        <li><strong>Activities:</strong> Jeep safaris, elephant-back safaris, birdwatching</li>
+        <li><strong>Access:</strong> Nearest towns: Golaghat, Nagaon; nearest airports: Jorhat, Guwahati</li>
+      </ul>
+
+      <hr>
+
+      <h3>🎨 Fun Fact</h3>
+      <p>Kaziranga is home to more than <strong>70% of the world's population</strong> of the Indian one-horned rhino.</p>
+    </article>
+  </main>
+</body>
+</html>

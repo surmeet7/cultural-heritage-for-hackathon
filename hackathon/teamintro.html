@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team - Indian Heritage</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --container-color: rgba(255, 255, 255, 0.08);
+            --backdrop-blur: blur(10px);
+            --title-color: #ffffff;
+            --text-color: rgba(255, 255, 255, 0.9);
+            --accent-color: #e53935;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #5a2a7b, #7b1fa2);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(229, 57, 53, 0.1) 0%, transparent 25%),
+                        radial-gradient(circle at 80% 70%, rgba(101, 31, 255, 0.1) 0%, transparent 25%);
+            z-index: -2;
+        }
+
+        .overlay-gradient {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.6));
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--title-color);
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .team-member {
+            background: var(--container-color);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .team-member:hover::before {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .member-avatar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .team-member:hover .member-avatar::after {
+            transform: translateX(100%);
+        }
+
+        .member-name {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .member-name::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--accent-color);
+            border-radius: 1px;
+        }
+
+        .member-role {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .member-description {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .school-section {
+            background: var(--container-color);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .school-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-color);
+        }
+
+        .school-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .school-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: var(--container-color);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        /* Gradient avatars for each member */
+        .rishabh { background: linear-gradient(45deg, #ff416c, #ff4b2b); }
+        .surmeet { background: linear-gradient(45deg, #4776E6, #8E54E9); }
+        .amarjot { background: linear-gradient(45deg, #FF8008, #FFC837); }
+
+        @media (max-width: 768px) {
+            .container { padding: 1.5rem; }
+            .title { font-size: 2.5rem; }
+            .team-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .team-member { padding: 2rem; }
+            .school-section { padding: 2rem; }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header, .team-member, .school-section {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .team-member:nth-child(1) { animation-delay: 0.1s; }
+        .team-member:nth-child(2) { animation-delay: 0.2s; }
+        .team-member:nth-child(3) { animation-delay: 0.3s; }
+        .school-section { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="overlay-gradient"></div>
+
+    <a href="index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Home
+    </a>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Meet Our Team</h1>
+            <p class="subtitle">Passionate students dedicated to preserving and celebrating India's rich cultural heritage through innovative digital storytelling</p>
+        </div>
+
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="member-avatar rishabh">R</div>
+                <h3 class="member-name">Rishabh</h3>
+                <p class="member-role">Project Lead & Developer</p>
+                <p class="member-description">Leading the technical development and ensuring our heritage project captures the essence of India's diverse cultural tapestry through modern web technologies.</p>
+            </div>
+
+            <div class="team-member">
+                <div class="member-avatar surmeet">S</div>
+                <h3 class="member-name">Surmeet</h3>
+                <p class="member-role">Research & Content Specialist</p>
+                <p class="member-description">Conducting in-depth research on Indian heritage and curating authentic content that honors our ancestors' wisdom and traditions.</p>
+            </div>
+
+            <div class="team-member">
+                <div class="member-avatar amarjot">A</div>
+                <h3 class="member-name">Amarjot</h3>
+                <p class="member-role">Design & UX Specialist</p>
+                <p class="member-description">Creating intuitive and beautiful user experiences that make exploring Indian heritage engaging and accessible for all generations.</p>
+            </div>
+        </div>
+
+        <div class="school-section">
+            <h2 class="school-title">Our Educational Journey</h2>
+            <p class="school-description">
+                This project represents the culmination of our academic journey and shared passion for preserving Indian heritage. 
+                As students, we believe in the power of technology to bridge the gap between ancient wisdom and modern understanding. 
+                Our goal is to create an immersive digital experience that not only educates but inspires future generations 
+                to appreciate and protect the incredible diversity of Indian culture, traditions, and values.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive hover effects
+        document.querySelectorAll('.team-member').forEach(member => {
+            member.addEventListener('mousemove', (e) => {
+                const rect = member.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                member.style.setProperty('--mouse-x', `${x}px`);
+                member.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>

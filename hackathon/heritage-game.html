@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Adventure Quest</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #4a148c;
+            --secondary: #ff6f00;
+            --accent: #1de9b6;
+            --dark: #1a237e;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --glass-bg: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+    body { font-family:'Poppins',sans-serif; min-height:100vh; background: radial-gradient(circle at top,#0b0220,#000511); color:var(--text-light); overflow-x:hidden }
+
+    .background { position:fixed; inset:0; background-image:url('./assets/images/taj-original.jpg'); background-size:cover; background-position:center; filter: blur(8px) brightness(0.4); z-index:-1 }
+
+    .game-container { max-width:1200px; margin:1.5rem auto; padding:1.25rem }
+
+    .game-header { text-align:center; margin-bottom:1.5rem }
+
+    .game-title { font-size:2.8rem; margin-bottom:.6rem; background:linear-gradient(45deg,var(--accent),var(--secondary)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent }
+
+    .game-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:1.25rem; margin-top:1.25rem }
+
+    .game-card { background:var(--glass-bg); backdrop-filter:blur(12px); border:1px solid var(--glass-border); border-radius:1rem; padding:1.25rem; text-align:center; transition:transform .25s, box-shadow .25s; cursor:pointer; position:relative; overflow:hidden }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.1), 
+                rgba(255,255,255,0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+    .game-card:hover { transform: translateY(-8px); box-shadow: 0 18px 36px rgba(0,0,0,0.28) }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+    .card-image { width:100%; height:160px; object-fit:cover; border-radius:.6rem; margin-bottom:1rem; box-shadow:0 6px 18px rgba(0,0,0,0.14) }
+
+    .card-title { font-size:1.25rem; margin-bottom:.6rem; color:var(--primary) }
+
+        .card-description {
+            font-size: 1rem;
+            color: var(--text-light);
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
+    .play-button { padding:.8rem 1.2rem; background: linear-gradient(45deg,var(--primary),var(--dark)); border:none; border-radius:1rem; color:var(--text-light); font-weight:600; cursor:pointer; transition:transform .25s, box-shadow .25s }
+
+    .play-button:hover { transform: translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.24) }
+
+        .game-level {
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 5px var(--primary);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--primary);
+            }
+            100% {
+                box-shadow: 0 0 5px var(--primary);
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .game-card {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">Heritage Adventure Quest</h1>
+            <p class="subtitle">Explore India's Rich Cultural Heritage Through Interactive Challenges</p>
+        </header>
+
+        <div class="game-grid">
+            <!-- Memory Match Challenge -->
+            <div class="game-card">
+                <img src="./assets/images/taj-original.jpg" alt="Memory Match" class="card-image">
+                <div class="game-level">Level: Beginner</div>
+                <h2 class="card-title">Heritage Memory Match</h2>
+                <p class="card-description">Match pairs of Indian monuments and cultural symbols in this memory game.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="play-button" onclick="window.location.href='heritage-match.html'">Play Memory Game</button>
+            </div>
+
+            <!-- Speed Quiz -->
+            <div class="game-card">
+                <img src="./assets/images/taj-modified.jpg" alt="Speed Quiz" class="card-image">
+                <div class="game-level">Level: Intermediate</div>
+                <h2 class="card-title">Lightning Round</h2>
+                <p class="card-description">Race against time! Answer quick questions about Indian heritage. Extra points for speed!</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="play-button" onclick="window.location.href='heritage-speed.html'">Start Speed Quiz</button>
+            </div>
+
+            <!-- Puzzle Challenge -->
+            <div class="game-card">
+                <img src="./assets/images/taj-original.jpg" alt="Heritage Puzzle" class="card-image">
+                <div class="game-level">Level: Advanced</div>
+                <h2 class="card-title">Monument Puzzle</h2>
+                <p class="card-description">Solve sliding puzzles of famous Indian monuments and unlock their stories!</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="play-button" onclick="window.location.href='heritage-puzzle.html'">Solve Puzzle</button>
+            </div>
+
+            <!-- Word Search -->
+            <div class="game-card">
+                <img src="./assets/images/taj-modified.jpg" alt="Word Search" class="card-image">
+                <div class="game-level">Level: All Ages</div>
+                <h2 class="card-title">Heritage Word Hunt</h2>
+                <p class="card-description">Find hidden words related to Indian culture, monuments, and traditions.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="play-button" onclick="window.location.href='heritage-word.html'">Find Words</button>
+            </div>
+
+            <!-- Spot the Difference -->
+            <div class="game-card">
+                <img src="./assets/images/red-original.jpg" alt="Spot Differences" class="card-image">
+                <div class="game-level">Level: Challenging</div>
+                <h2 class="card-title">Eagle Eye</h2>
+                <p class="card-description">Spot the differences in pictures of Indian monuments and artwork!</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="play-button" onclick="window.location.href='heritage-spot.html'">Find Differences</button>
+            </div>
+
+            <!-- Trivia Challenge -->
+            <div class="game-card">
+                <img src="./assets/images/red-modified.jpg" alt="Trivia Challenge" class="card-image">
+                <div class="game-level">Level: Expert</div>
+                <h2 class="card-title">Heritage Master</h2>
+                <p class="card-description">Test your expertise with in-depth questions about Indian heritage and culture.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="play-button" onclick="window.location.href='heritage-quiz.html'">Start Trivia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize progress bars
+        document.addEventListener('DOMContentLoaded', () => {
+            // Try to load progress from localStorage
+            const savedProgress = JSON.parse(localStorage.getItem('heritageGameProgress') || '{}');
+            
+            // Update progress bars for each game
+            document.querySelectorAll('.game-card').forEach(card => {
+                const gameId = card.querySelector('.play-button').onclick.toString().match(/heritage-(\w+)\.html/)[1];
+                const progress = savedProgress[gameId] || 0;
+                card.querySelector('.progress-fill').style.width = `${progress}%`;
+            });
+        });
+
+        // Handle image loading errors
+        document.querySelectorAll('.card-image').forEach(img => {
+            img.onerror = function() {
+                this.src = './assets/images/taj-original.jpg'; // Fallback image
+            };
+        });
+
+        // Game data (for future use with local storage)
+        const games = {
+            memory: {
+                pairs: [
+                    { id: 1, name: "Taj Mahal", image: "./assets/images/taj-original.jpg" },
+                    { id: 2, name: "India Gate", image: "./assets/images/taj-modified.jpg" },
+                    { id: 3, name: "Red Fort", image: "./assets/images/red-original.jpg" },
+                    { id: 4, name: "Golden Temple", image: "./assets/images/red-modified.jpg" }
+                ]
+            },
+            speed: {
+                timeLimit: 30,
+                questions: [
+                    {
+                        question: "Which Mughal emperor built the Taj Mahal?",
+                        options: ["Shah Jahan", "Akbar", "Aurangzeb", "Jahangir"],
+                        correct: 0,
+                        points: 100
+                    },
+                    {
+                        question: "Which city is known as the Pink City?",
+                        options: ["Jaipur", "Delhi", "Mumbai", "Kolkata"],
+                        correct: 0,
+                        points: 100
+                    },
+                    {
+                        question: "What is India's national animal?",
+                        options: ["Tiger", "Lion", "Elephant", "Peacock"],
+                        correct: 0,
+                        points: 100
+                    }
+                ]
+            },
+            puzzle: {
+                images: [
+                    {
+                        name: "Taj Mahal",
+                        image: "taj.jpg",
+                        gridSize: 3,
+                        story: "Built by Shah Jahan as a memorial to his beloved wife Mumtaz Mahal"
+                    },
+                    {
+                        name: "India Gate",
+                        image: "indiagate.jpg",
+                        gridSize: 3,
+                        story: "A war memorial honoring Indian soldiers who died in World War I"
+                    }
+                ]
+            },
+            wordsearch: {
+                grids: [
+                    {
+                        words: ["TAJMAHAL", "DELHI", "AGRA", "CULTURE", "HERITAGE", "INDIA"],
+                        size: 10,
+                        difficulty: "Easy"
+                    },
+                    {
+                        words: ["ARCHITECTURE", "MONUMENT", "TRADITION", "FESTIVAL", "HISTORY"],
+                        size: 12,
+                        difficulty: "Medium"
+                    }
+                ]
+            },
+            spot: {
+                images: [
+                    {
+                        original: "taj.jpg",
+                        modified: "taj-modified.jpg",
+                        differences: 5,
+                        name: "Taj Mahal Differences"
+                    },
+                    {
+                        original: "redfort.jpg",
+                        modified: "redfort-modified.jpg",
+                        differences: 6,
+                        name: "Red Fort Differences"
+                    }
+                ]
+            },
+            trivia: {
+                questions: [
+                    {
+                        question: "Which architectural style is the Taj Mahal built in?",
+                        options: ["Mughal", "Gothic", "Dravidian", "Indo-Saracenic"],
+                        correct: 0,
+                        difficulty: "Expert"
+                    },
+                    {
+                        question: "What is the significance of the Ashoka Chakra?",
+                        options: [
+                            "Law of Dharma",
+                            "Wheel of Life",
+                            "Symbol of Progress",
+                            "National Unity"
+                        ],
+                        correct: 0,
+                        difficulty: "Expert"
+                    },
+                    {
+                        question: "Which dynasty built the Khajuraho temples?",
+                        options: ["Chandela", "Gupta", "Maurya", "Chola"],
+                        correct: 0,
+                        difficulty: "Expert"
+                    }
+                ]
+            }
+        };
+
+        function startGame(gameType) {
+            currentGame = gameType;
+            currentQuestion = 0;
+            score = 0;
+            timer = null;
+            
+            switch(gameType) {
+                case 'memory':
+                    initializeMemoryGame();
+                    break;
+                case 'speed':
+                    initializeSpeedQuiz();
+                    break;
+                case 'puzzle':
+                    initializePuzzle();
+                    break;
+                case 'wordsearch':
+                    initializeWordSearch();
+                    break;
+                case 'spot':
+                    initializeSpotDifference();
+                    break;
+                case 'trivia':
+                    initializeTriviaGame();
+                    break;
+            }
+            
+            document.getElementById('gameModal').style.display = 'flex';
+        }
+
+        function initializeMemoryGame() {
+            const pairs = games.memory.pairs;
+            let html = `
+                <h2>Heritage Memory Match</h2>
+                <div class="memory-grid">
+                    ${pairs.concat(pairs).sort(() => Math.random() - 0.5).map((card, index) => `
+                        <div class="memory-card" data-id="${card.id}" onclick="flipCard(${index})">
+                            <div class="memory-card-inner">
+                                <div class="memory-card-front"></div>
+                                <div class="memory-card-back">
+                                    <img src="${card.image}" alt="${card.name}">
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="game-stats">Matches: <span id="matches">0</span> | Attempts: <span id="attempts">0</span></div>
+            `;
+            document.getElementById('modalContent').innerHTML = html;
+        }
+
+        function initializeSpeedQuiz() {
+            let timeLeft = games.speed.timeLimit;
+            const question = games.speed.questions[currentQuestion];
+            
+            let html = `
+                <h2>Lightning Round!</h2>
+                <div class="timer">Time Left: <span id="timeLeft">${timeLeft}</span>s</div>
+                <div class="question-container">
+                    <h3>${question.question}</h3>
+                    <div class="options-container">
+                        ${question.options.map((option, index) => `
+                            <button class="option-button" onclick="checkSpeedAnswer(${index})">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="score">Score: <span id="currentScore">0</span></div>
+            `;
+            document.getElementById('modalContent').innerHTML = html;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timeLeft').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    showResult();
+                }
+            }, 1000);
+        }
+
+        function initializePuzzle() {
+            const puzzle = games.puzzle.images[0];
+            let html = `
+                <h2>${puzzle.name} Puzzle</h2>
+                <div class="puzzle-grid" style="grid-template-columns: repeat(${puzzle.gridSize}, 1fr);">
+                    ${Array(puzzle.gridSize * puzzle.gridSize).fill(0).map((_, index) => `
+                        <div class="puzzle-piece" data-index="${index}">
+                            <img src="${puzzle.image}" style="clip-path: inset(${Math.floor(index / puzzle.gridSize) * (100/puzzle.gridSize)}% ${100 - ((index % puzzle.gridSize + 1) * (100/puzzle.gridSize))}% ${100 - ((Math.floor(index / puzzle.gridSize) + 1) * (100/puzzle.gridSize))}% ${(index % puzzle.gridSize) * (100/puzzle.gridSize)}%)">
+                        </div>
+                    `).join('')}
+                </div>
+                <p class="puzzle-story">${puzzle.story}</p>
+            `;
+            document.getElementById('modalContent').innerHTML = html;
+        }
+
+        function checkAnswer(selected) {
+            const correct = games[currentGame].questions[currentQuestion].correct;
+            if (selected === correct) {
+                score++;
+            }
+            currentQuestion++;
+            
+            if (currentQuestion < games[currentGame].questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const percentage = (score / games[currentGame].questions.length) * 100;
+            let html = `
+                <h2>Game Complete!</h2>
+                <p>Your Score: ${score}/${games[currentGame].questions.length}</p>
+                <p>Percentage: ${percentage}%</p>
+                <button class="play-button" onclick="closeModal()">Close</button>
+            `;
+            document.getElementById('modalContent').innerHTML = html;
+
+            // Update progress bar
+            const gameCard = document.querySelector(`[onclick="startGame('${currentGame}')"]`);
+            const progressFill = gameCard.querySelector('.progress-fill');
+            progressFill.style.width = `${percentage}%`;
+        }
+
+        function closeModal() {
+            document.getElementById('gameModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('gameModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

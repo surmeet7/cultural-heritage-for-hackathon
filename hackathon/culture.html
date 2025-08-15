@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Different Cultures of India</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+    :root {
+      --container-color: rgba(255, 255, 255, 0.08);
+      --backdrop-blur: blur(12px);
+      --title-color: #ffb300; /* amber */
+      --text-color: rgba(255, 255, 255, 0.95);
+      --accent-color: #ff9800;
+      --chip-bg: rgba(255,255,255,0.12);
+      --chip-border: rgba(255,255,255,0.18);
+      --chakra: #0a3b8e; /* Ashoka Chakra blue */
+      --saffron: #ff9933;
+      --whiteish: #ffffff;
+      --green: #138808;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      color: var(--text-color);
+      min-height: 100vh;
+      scroll-behavior: smooth;
+      background: #0b0b0b;
+    }
+
+    /* Indian Flag Background */
+    .flag { position: fixed; inset: 0; z-index: -3; }
+    .flag::before{
+      content: ""; position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom,
+          var(--saffron) 0 33%,
+          var(--whiteish) 33% 66%,
+          var(--green) 66% 100%);
+      filter: saturate(1.05) brightness(.92);
+    }
+    /* Subtle texture & vignette */
+    .flag::after{
+      content: ""; position: absolute; inset:0;
+      background:
+        radial-gradient(1200px 600px at 10% 15%, rgba(0,0,0,.18), transparent 40%),
+        radial-gradient(900px 500px at 90% 85%, rgba(0,0,0,.22), transparent 45%),
+        linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.35));
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    /* Faint Ashoka Chakra watermark */
+    .chakra { position: fixed; inset: 0; display:grid; place-items:center; z-index:-2; pointer-events:none; }
+    .chakra::before{
+      content:""; width:min(38vw,420px); aspect-ratio:1/1; border-radius:50%; opacity:.14;
+      box-shadow: inset 0 0 0 6px var(--chakra);
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,.6), rgba(255,255,255,0) 60%),
+        repeating-conic-gradient(from 0deg,
+          var(--chakra) 0 7.5deg,
+          transparent 7.5deg 15deg);
+      filter: drop-shadow(0 0 18px rgba(0,0,0,.35));
+    }
+
+    /* Top Bar */
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: var(--backdrop-blur);
+      background: rgba(0,0,0,.25);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .topbar-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; padding: .75rem 1rem; }
+    .brand { display: flex; align-items: center; gap: .75rem; }
+    .logo { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--saffron), var(--title-color)); display: grid; place-items: center; color: #1b1b1b; font-weight: 800; }
+    .title { font-size: 1.15rem; letter-spacing: .5px; font-weight: 600; color: var(--title-color); }
+
+    .controls { display: flex; gap: .5rem; align-items: center; }
+    .chip { cursor: pointer; user-select: none; background: var(--chip-bg); border: 1px solid var(--chip-border); padding: .4rem .8rem; border-radius: 999px; font-size: .85rem; transition: .25s; }
+    .chip:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
+    .chip.active { background: linear-gradient(135deg, var(--saffron), var(--title-color)); color: #1a1a1a; border-color: transparent; }
+
+    .container { max-width: 1200px; margin: 1.25rem auto 3rem; padding: 1rem; }
+
+    /* Grid */
+    .grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+    @media (min-width: 720px){ .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1080px){ .grid { grid-template-columns: repeat(3, 1fr); } }
+
+    /* Card */
+    .card { position: relative; background: var(--container-color); border: 1px solid rgba(255,255,255,.12); backdrop-filter: var(--backdrop-blur); border-radius: 20px; overflow: hidden; transition: .35s ease; transform-style: preserve-3d; }
+    .card:hover { box-shadow: 0 12px 40px rgba(0,0,0,.35); transform: translateY(-4px); }
+
+    .cover { position: relative; height: 220px; overflow: hidden; }
+    .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover .fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.45)); }
+    .badge { position: absolute; left: 12px; top: 12px; padding: .35rem .6rem; font-size: .75rem; border-radius: 999px; background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.18); }
+    .fav { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.4); cursor: pointer; }
+    .fav.active { background: linear-gradient(135deg, var(--saffron), var(--title-color)); color: #1b1b1b; }
+
+    .body { padding: 1rem 1rem 1.1rem; }
+    .body h3 { color: var(--title-color); font-size: 1.15rem; margin: .2rem 0 .35rem; }
+    .meta { font-size: .85rem; opacity: .9; margin-bottom: .5rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin: .3rem 0 1rem; }
+    .tag { font-size: .72rem; padding: .25rem .5rem; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(255,255,255,.08); }
+
+    .actions { display: flex; gap: .5rem; }
+  .btn { text-decoration: none; border: 1px solid rgba(255,255,255,.18); padding: .55rem .9rem; border-radius: 999px; background: var(--chip-bg); color: var(--text-color); display: inline-flex; gap: .5rem; align-items: center; transition: .25s; }
+    .btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.2); }
+  .btn.primary { background: linear-gradient(135deg, var(--saffron), var(--title-color)); color: #1b1b1b; border: none; border-radius: 999px; }
+
+    details { border-top: 1px dashed rgba(255,255,255,.12); padding-top: .6rem; margin-top: .6rem; }
+    summary { cursor: pointer; list-style: none; user-select: none; opacity: .95; }
+
+    /* Footer */
+    .footer { max-width: 1200px; margin: 1rem auto 3rem; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; opacity: .85; }
+
+    /* Back to Top */
+    .to-top { position: fixed; bottom: 18px; right: 18px; z-index: 40; opacity: 0; pointer-events: none; transition: .3s; }
+    .to-top.show { opacity: 1; pointer-events: auto; }
+    .to-top .btn { border-radius: 999px; padding: .7rem .9rem; }
+
+    /* Progress bar */
+    .progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--saffron), var(--title-color)); width: 0%; z-index: 50; box-shadow: 0 0 12px rgba(255,152,0,.6); }
+
+    @media (prefers-reduced-motion: reduce){
+      .card:hover { transform: none; }
+      .btn:hover { transform: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="flag" aria-hidden="true"></div>
+  <div class="chakra" aria-hidden="true"></div>
+  <div class="progress" id="progress"></div>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">DC</div>
+        <div>
+          <div class="title">Different Cultures of India</div>
+          <div style="font-size:.8rem; opacity:.85">Highlights + quick Wikipedia links</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="chip active" data-filter="all" aria-pressed="true">All</button>
+        <button class="chip" data-filter="favourite">★ Favourites</button>
+  <a class="btn" href="index.html" aria-label="Back to home">← Back to Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid" id="grid">
+      <!-- Cards start -->
+
+      <!-- Kerala -->
+      <article class="card" data-name="kerala" data-tags="kathakali onam ayurveda south" id="kerala" data-wiki="Kathakali">
+        <div class="cover">
+          <img loading="lazy" alt="Kerala Culture - Kathakali" data-key="kerala" />
+          <div class="fade"></div>
+          <span class="badge">Kerala</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Kerala Culture</h3>
+          <div class="meta">Kathakali • Onam • Ayurveda</div>
+          <div class="tags"><span class="tag">Dance</span><span class="tag">Festival</span><span class="tag">Wellness</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Classical theatre-dance <em>Kathakali</em> and <em>Mohiniyattam</em>.</li>
+              <li>Harvest festival <em>Onam</em> with Vallamkali (boat race).</li>
+              <li>World-renowned Ayurveda traditions.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#kerala"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Punjab -->
+      <article class="card" data-name="punjab" data-tags="bhangra gidda lohri north" id="punjab" data-wiki="Giddha">
+        <div class="cover">
+          <img loading="lazy" alt="Punjabi Culture - Giddha/Bhangra" data-key="punjab" />
+          <div class="fade"></div>
+          <span class="badge">Punjab</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Punjabi Culture</h3>
+          <div class="meta">Bhangra • Giddha • Lohri</div>
+          <div class="tags"><span class="tag">Dance</span><span class="tag">Festival</span><span class="tag">Cuisine</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>High-energy folk dances <em>Bhangra</em> and <em>Giddha</em>.</li>
+              <li>Harvest celebrations: <em>Lohri</em> and <em>Baisakhi</em>.</li>
+              <li>Rich, hearty cuisine and hospitality.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#punjab"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Gujarat -->
+      <article class="card" data-name="gujarat" data-tags="garba dandiya navratri west" id="gujarat" data-wiki="Garba_(dance)">
+        <div class="cover">
+          <img loading="lazy" alt="Gujarat Culture - Garba" data-key="gujarat" />
+          <div class="fade"></div>
+          <span class="badge">Gujarat</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Gujarat Culture</h3>
+          <div class="meta">Garba • Dandiya • Navratri</div>
+          <div class="tags"><span class="tag">Dance</span><span class="tag">Craft</span><span class="tag">Festivals</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Vibrant <em>Garba</em> and <em>Dandiya</em> during Navratri.</li>
+              <li>Bandhani textiles and Kutch crafts.</li>
+              <li>Heritage cities and stepwells.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#gujarat"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Assam -->
+      <article class="card" data-name="assam" data-tags="bihu silk tea northeast" id="assam" data-wiki="Bihu">
+        <div class="cover">
+          <img loading="lazy" alt="Assamese Culture - Bihu" data-key="assam" />
+          <div class="fade"></div>
+          <span class="badge">Assam</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Assamese Culture</h3>
+          <div class="meta">Bihu • Silk • Tea</div>
+          <div class="tags"><span class="tag">Festival</span><span class="tag">Weaving</span><span class="tag">Nature</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Springtime <em>Bihu</em> festivities and dance.</li>
+              <li>Muga & Eri silk weaving traditions.</li>
+              <li>Tea gardens and wildlife heritage.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#assam"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Tamil Nadu -->
+      <article class="card" data-name="tamil" data-tags="bharatanatyam pongal carnatic south" id="tamil" data-wiki="Bharatanatyam">
+        <div class="cover">
+          <img loading="lazy" alt="Tamil Culture - Bharatanatyam" data-key="tamil" />
+          <div class="fade"></div>
+          <span class="badge">Tamil Nadu</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Tamil Culture</h3>
+          <div class="meta">Bharatanatyam • Pongal • Carnatic</div>
+          <div class="tags"><span class="tag">Classical</span><span class="tag">Festival</span><span class="tag">Temple</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Classical dance <em>Bharatanatyam</em> and Carnatic music.</li>
+              <li>Harvest festival <em>Pongal</em>.</li>
+              <li>Dravidian temple architecture.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#tamil"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Bengal -->
+      <article class="card" data-name="bengal" data-tags="durga puja literature sweets east" id="bengal" data-wiki="Durga_Puja">
+        <div class="cover">
+          <img loading="lazy" alt="Bengali Culture - Durga Puja" data-key="bengal" />
+          <div class="fade"></div>
+          <span class="badge">Bengal</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Bengali Culture</h3>
+          <div class="meta">Durga Puja • Literature • Sweets</div>
+          <div class="tags"><span class="tag">Festival</span><span class="tag">Art</span><span class="tag">Cuisine</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Iconic <em>Durga Puja</em> pandals.</li>
+              <li>Literary heritage and films.</li>
+              <li>Mithai like <em>rosogolla</em> & <em>sandesh</em>.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#bengal"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Rajasthan -->
+      <article class="card" data-name="rajasthan" data-tags="folk ghoomar desert palaces west" id="rajasthan" data-wiki="Ghoomar">
+        <div class="cover">
+          <img loading="lazy" alt="Rajasthani Culture - Ghoomar/Kalbeliya" data-key="rajasthan" />
+          <div class="fade"></div>
+          <span class="badge">Rajasthan</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Rajasthani Culture</h3>
+          <div class="meta">Ghoomar • Folk Music • Forts</div>
+          <div class="tags"><span class="tag">Folk</span><span class="tag">Heritage</span><span class="tag">Costume</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Folk dances like <em>Ghoomar</em> and Kalbeliya.</li>
+              <li>Forts, palaces, and desert fairs.</li>
+              <li>Vibrant textiles and jewelry.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#rajasthan"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Andhra Pradesh -->
+      <article class="card" data-name="andhra" data-tags="kuchipudi sankranti spicy telugu south" id="andhra" data-wiki="Kuchipudi">
+        <div class="cover">
+          <img loading="lazy" alt="Andhra Culture - Kuchipudi" data-key="andhra" />
+          <div class="fade"></div>
+          <span class="badge">Andhra Pradesh</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Andhra Culture</h3>
+          <div class="meta">Kuchipudi • Sankranti • Spicy Cuisine</div>
+          <div class="tags"><span class="tag">Dance</span><span class="tag">Festival</span><span class="tag">Cuisine</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Classical dance <em>Kuchipudi</em>.</li>
+              <li><em>Sankranti</em> and kites.</li>
+              <li>Fiery flavors and pickles.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#andhra"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Odisha -->
+      <article class="card" data-name="odisha" data-tags="puri jagannath rath yatra chhau east" id="odisha" data-wiki="Konark_Sun_Temple">
+        <div class="cover">
+          <img loading="lazy" alt="Odisha Culture - Konark/Chhau" data-key="odisha" />
+          <div class="fade"></div>
+          <span class="badge">Odisha</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Odisha Culture</h3>
+          <div class="meta">Jagannath • Rath Yatra • Chhau</div>
+          <div class="tags"><span class="tag">Pilgrimage</span><span class="tag">Dance</span><span class="tag">Temple</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Jagannath Puri temple and <em>Rath Yatra</em>.</li>
+              <li>Classical <em>Odissi</em> and <em>Chhau</em> dances.</li>
+              <li>Appliqué crafts of Pipili.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#odisha"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Goa -->
+      <article class="card" data-name="goa" data-tags="carnival konkan portuguese beach west" id="goa" data-wiki="Basilica_of_Bom_Jesus">
+        <div class="cover">
+          <img loading="lazy" alt="Goan Culture - Basilica/Carnival" data-key="goa" />
+          <div class="fade"></div>
+          <span class="badge">Goa</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Goan Culture</h3>
+          <div class="meta">Carnival • Beaches • Heritage</div>
+          <div class="tags"><span class="tag">Festival</span><span class="tag">Music</span><span class="tag">Heritage</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Vibrant Goa Carnival parades.</li>
+              <li>Indo-Portuguese architecture & cuisine.</li>
+              <li>Coastal music and folk theatre.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#goa"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Maharashtra -->
+      <article class="card" data-name="maharashtra" data-tags="lavani ganesh chaturthi marathi west" id="maharashtra" data-wiki="Ganesh_Chaturthi">
+        <div class="cover">
+          <img loading="lazy" alt="Maharashtrian Culture - Ganesh Chaturthi" data-key="maharashtra" />
+          <div class="fade"></div>
+          <span class="badge">Maharashtra</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Maharashtrian Culture</h3>
+          <div class="meta">Lavani • Ganesh Chaturthi • Warkari</div>
+          <div class="tags"><span class="tag">Festival</span><span class="tag">Dance</span><span class="tag">Pilgrimage</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Energetic <em>Lavani</em> and <em>Tamasha</em> theatre.</li>
+              <li>Mumbai's grand <em>Ganesh Chaturthi</em>.</li>
+              <li><em>Warkari</em> tradition to Pandharpur.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#maharashtra"># Link</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Kashmir / J&K -->
+      <article class="card" data-name="kashmir" data-tags="wazwan kashmiri kahwa pheran north" id="kashmir" data-wiki="Dal_Lake">
+        <div class="cover">
+          <img loading="lazy" alt="Kashmiri Culture - Dal Lake" data-key="kashmir" />
+          <div class="fade"></div>
+          <span class="badge">Kashmir</span>
+          <button class="fav" title="Toggle favourite" aria-label="Toggle favourite">♡</button>
+        </div>
+        <div class="body">
+          <h3>Kashmiri Culture</h3>
+          <div class="meta">Wazwan • Crafts • Folk</div>
+          <div class="tags"><span class="tag">Cuisine</span><span class="tag">Craft</span><span class="tag">Tradition</span></div>
+          <details>
+            <summary>Highlights</summary>
+            <ul>
+              <li>Multi-course <em>Wazwan</em> cuisine.</li>
+              <li>Pashmina and papier-mâché crafts.</li>
+              <li>Rouf folk dance and <em>Kahwa</em> tea.</li>
+            </ul>
+          </details>
+          <div class="actions">
+            <a class="btn primary learn" target="_blank" rel="noopener">Learn More</a>
+            <a class="btn" href="#kashmir"># Link</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <div class="footer">
+    <div>build by sacrificing sleep</div>
+    <div style="display:flex; gap:.5rem; align-items:center; opacity:.9">
+      <span>Tip:</span> <span>Mark ★ favourites and click any image to preview.</span>
+    </div>
+  </div>
+
+  <div class="to-top" id="toTop"><a class="btn" href="#top" aria-label="Back to top">↑ Back to Top</a></div>
+
+  <!-- Image Modal -->
+  <dialog id="lightbox" style="border:none; padding:0; background:transparent;">
+    <div style="position:relative; max-width:90vw; max-height:90vh;">
+      <img id="lightboxImg" alt="Preview" style="width:100%; height:100%; object-fit:contain; border-radius:16px;" />
+      <button id="lightboxClose" class="btn" style="position:absolute; top:10px; right:10px; border-radius:999px;">✕</button>
+    </div>
+  </dialog>
+
+  <script>
+    // --- Wikipedia-powered images & links (reliable, culture-specific) ---
+    const WIKI = {
+      kerala: 'Kathakali',
+      punjab: 'Giddha', // or Bhangra_(dance)
+      gujarat: 'Garba_(dance)',
+      assam: 'Bihu',
+      tamil: 'Bharatanatyam',
+      bengal: 'Durga_Puja',
+      rajasthan: 'Ghoomar',
+      andhra: 'Kuchipudi',
+      odisha: 'Konark_Sun_Temple',
+      goa: 'Basilica_of_Bom_Jesus',
+      maharashtra: 'Ganesh_Chaturthi',
+      kashmir: 'Dal_Lake'
+    };
+
+    async function setCardAssets(){
+      const cards = document.querySelectorAll('.card');
+      await Promise.all([...cards].map(async card => {
+        const key = card.querySelector('img[data-key]').dataset.key;
+        const title = card.dataset.wiki || WIKI[key];
+        const img = card.querySelector('img');
+        const learn = card.querySelector('.learn');
+        if(learn && title){
+          learn.href = `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+        }
+        try{
+          if(title){
+            const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+            if(res.ok){
+              const data = await res.json();
+              const src = (data.originalimage && data.originalimage.source) || (data.thumbnail && data.thumbnail.source);
+              if(src){ img.src = src; }
+            }
+          }
+        }catch(e){ /* ignore and let it fallback */ }
+        img.onerror = () => { img.src = 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png'; };
+        img.onclick = () => openLightbox(img.src);
+      }));
+    }
+
+    // favourite toggle with localStorage
+    function initFavourites(){
+      const saved = JSON.parse(localStorage.getItem('favs')||'[]');
+      const setState = (btn, active) => { btn.classList.toggle('active', active); btn.textContent = active ? '★' : '♡'; };
+      document.querySelectorAll('.card').forEach(card => {
+        const id = card.id; const btn = card.querySelector('.fav');
+        setState(btn, saved.includes(id));
+        btn.addEventListener('click', () => {
+          let favs = new Set(JSON.parse(localStorage.getItem('favs')||'[]'));
+          if(favs.has(id)) favs.delete(id); else favs.add(id);
+          localStorage.setItem('favs', JSON.stringify([...favs]));
+          setState(btn, favs.has(id));
+          applyFilter();
+        });
+      });
+    }
+
+    // chips filter (All / Favourites)
+    function initChips(){
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          applyFilter();
+        });
+      });
+    }
+
+    function applyFilter(){
+      const favOnly = document.querySelector('.chip[data-filter="favourite"]').classList.contains('active');
+      document.querySelectorAll('.card').forEach(c => {
+        const fav = c.querySelector('.fav').classList.contains('active');
+        c.style.display = (!favOnly || fav) ? '' : 'none';
+      });
+    }
+
+    // lightbox
+    const dialog = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    document.getElementById('lightboxClose').onclick = () => dialog.close();
+    function openLightbox(src){ lightboxImg.src = src; dialog.showModal(); }
+
+    // back to top & progress bar
+    const toTop = document.getElementById('toTop');
+    const progress = document.getElementById('progress');
+    function onScroll(){
+      const y = window.scrollY;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = `${(y / h) * 100}%`;
+      toTop.classList.toggle('show', y > 600);
+    }
+    window.addEventListener('scroll', onScroll);
+
+    // init
+    setCardAssets();
+    initFavourites();
+    initChips();
+    applyFilter();
+    onScroll();
+  </script>
+</body>
+</html>

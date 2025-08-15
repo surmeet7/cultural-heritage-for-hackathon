@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monument Timeline Challenge</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    :root {
+      --bg: linear-gradient(135deg, #1f2340, #4b2a72);
+      --card: rgba(255, 255, 255, 0.04);
+      --accent: #ff9933;
+      --correct: #4caf50;
+      --incorrect: #e53935;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .game-container {
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+    }
+    .glass {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(6px);
+    }
+    h1 {
+      color: var(--accent);
+      margin-top: 0;
+    }
+    .instructions {
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+    .game-area {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .monument-pool, .timeline-slots {
+      padding: 1rem;
+      border-radius: 8px;
+      min-height: 150px;
+    }
+    .monument-pool {
+      width: 30%;
+      background: rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .timeline-slots {
+      width: 70%;
+      background: rgba(0,0,0,0.2);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      align-items: center;
+    }
+    .monument-card {
+      background: rgba(255,255,255,0.08);
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: grab;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .monument-card:active {
+      cursor: grabbing;
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    .monument-card img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+    .monument-card p {
+      margin: 0.5rem 0 0;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .timeline-slot {
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.4);
+    }
+    .dragging {
+      opacity: 0.5;
+    }
+    .drag-over {
+      border-color: var(--accent);
+      background: rgba(255,153,51,0.1);
+    }
+    .controls {
+      margin-top: 1.5rem;
+    }
+    .btn {
+      padding: .8rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #111;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .feedback {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-container glass">
+  <h1>Monument Timeline Challenge</h1>
+  <p class="instructions">Drag the monuments from the pool on the left to the timeline slots on the right. Arrange them in chronological order, from oldest to newest.</p>
+  
+  <div class="game-area">
+    <div id="monument-pool" class="monument-pool">
+      <!-- Monument cards will be generated here -->
+    </div>
+    <div id="timeline-slots" class="timeline-slots">
+      <!-- Timeline slots will be generated here -->
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="check-button" class="btn">Check Order</button>
+    <button id="reset-button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff;">Reset</button>
+  </div>
+  <div id="feedback" class="feedback"></div>
+  <a href="index.html" style="color: #fff; display: inline-block; margin-top: 1rem;">← Back to Home</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const monuments = [
+  { name: 'Qutub Minar', year: 1193, img: 'https://superbcollections.com/wp-content/uploads/2023/09/qutab-minar.jpg' },
+  { name: 'Hawa Mahal', year: 1799, img: 'https://upload.wikimedia.org/wikipedia/commons/4/41/East_facade_Hawa_Mahal_Jaipur_from_ground_level_%28July_2022%29_-_img_01.jpg' },
+    { name: 'Taj Mahal', year: 1632, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/960px-Taj_Mahal_%28Edited%29.jpeg' },
+    { name: 'Red Fort', year: 1639, img: 'https://static.toiimg.com/thumb/65666850/redfort1.jpg?width=1200&height=900' },
+    { name: 'India Gate', year: 1921, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/India_Gate_on_the_evening_of_77th_Independence_day.jpg/960px-India_Gate_on_the_evening_of_77th_Independence_day.jpg' },
+  ];
+
+  const pool = document.getElementById('monument-pool');
+  const slotsContainer = document.getElementById('timeline-slots');
+  const checkButton = document.getElementById('check-button');
+  const resetButton = document.getElementById('reset-button');
+  const feedback = document.getElementById('feedback');
+
+  let draggedItem = null;
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function setupGame() {
+    pool.innerHTML = '';
+    slotsContainer.innerHTML = '';
+    feedback.innerHTML = '';
+    feedback.style.color = '#fff';
+
+    const shuffledMonuments = shuffle([...monuments]);
+
+    shuffledMonuments.forEach(monument => {
+      const card = document.createElement('div');
+      card.className = 'monument-card';
+      card.draggable = true;
+      card.dataset.year = monument.year;
+      card.innerHTML = `<img src="${monument.img}" alt="${monument.name}"><p>${monument.name}</p>`;
+      pool.appendChild(card);
+    });
+
+    for (let i = 0; i < monuments.length; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'timeline-slot';
+      slot.dataset.index = i;
+      slotsContainer.appendChild(slot);
+    }
+
+    addDragListeners();
+  }
+
+  function addDragListeners() {
+    const cards = document.querySelectorAll('.monument-card');
+    cards.forEach(card => {
+      card.addEventListener('dragstart', dragStart);
+      card.addEventListener('dragend', dragEnd);
+    });
+
+    const slots = document.querySelectorAll('.timeline-slot');
+    slots.forEach(slot => {
+      slot.addEventListener('dragover', dragOver);
+      slot.addEventListener('dragenter', dragEnter);
+      slot.addEventListener('dragleave', dragLeave);
+      slot.addEventListener('drop', dragDrop);
+    });
+    
+    pool.addEventListener('dragover', dragOver);
+    pool.addEventListener('drop', (e) => {
+        if(draggedItem){
+            pool.appendChild(draggedItem);
+        }
+    });
+  }
+
+  function dragStart(e) {
+    draggedItem = e.target;
+    setTimeout(() => e.target.classList.add('dragging'), 0);
+  }
+
+  function dragEnd(e) {
+    e.target.classList.remove('dragging');
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+  }
+
+  function dragEnter(e) {
+    if (e.target.classList.contains('timeline-slot')) {
+      e.target.classList.add('drag-over');
+    }
+  }
+
+  function dragLeave(e) {
+    if (e.target.classList.contains('timeline-slot')) {
+      e.target.classList.remove('drag-over');
+    }
+  }
+
+  function dragDrop(e) {
+    e.preventDefault();
+    if (e.target.classList.contains('timeline-slot')) {
+      if (e.target.children.length === 0) {
+        e.target.appendChild(draggedItem);
+      }
+      e.target.classList.remove('drag-over');
+    }
+  }
+
+  function checkOrder() {
+    const slots = slotsContainer.querySelectorAll('.timeline-slot');
+    const placedYears = [];
+    let allSlotsFilled = true;
+
+    slots.forEach(slot => {
+      if (slot.children.length > 0) {
+        placedYears.push(parseInt(slot.children[0].dataset.year));
+      } else {
+        allSlotsFilled = false;
+      }
+    });
+
+    if (!allSlotsFilled) {
+      feedback.textContent = 'Please place all monuments in the timeline.';
+      feedback.style.color = '#ffd27a';
+      return;
+    }
+
+    const sortedYears = [...placedYears].sort((a, b) => a - b);
+    const isCorrect = JSON.stringify(placedYears) === JSON.stringify(sortedYears);
+
+    if (isCorrect) {
+      feedback.textContent = 'Congratulations! The order is correct!';
+      feedback.style.color = 'lightgreen';
+    } else {
+      feedback.textContent = 'Not quite right. Try again!';
+      feedback.style.color = 'lightcoral';
+    }
+  }
+
+  checkButton.addEventListener('click', checkOrder);
+  resetButton.addEventListener('click', setupGame);
+
+  setupGame();
+});
+</script>
+
+</body>
+</html>

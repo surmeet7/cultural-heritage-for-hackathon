@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cultural Heritage Challenge</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --primary: #ff9933;
+      --secondary: #00ff88;
+      --danger: #ff4757;
+      --success: #2ed573;
+      --warning: #ffa502;
+      --info: #3742fa;
+      --glass-bg: rgba(255,255,255,0.05);
+      --glass-border: rgba(255,255,255,0.1);
+      --dark-overlay: rgba(0,0,0,0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: radial-gradient(circle at 30% 20%, #1a0033 0%, #000511 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 1rem;
+      overflow-x: hidden;
+    }
+
+    /* Animated background particles */
+    .bg-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: 
+        radial-gradient(circle at 80% 20%, rgba(255, 153, 51, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+    }
+
+    .game-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 2px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 255, 136, 0.1);
+      animation: gameGlow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes gameGlow {
+      from { box-shadow: 0 20px 40px rgba(0, 255, 136, 0.1); }
+      to { box-shadow: 0 20px 60px rgba(255, 153, 51, 0.15); }
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .game-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 0.5rem;
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+
+    @keyframes titlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .game-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 1rem;
+    }
+
+    .game-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .question-area {
+      background: rgba(0,0,0,0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 2px solid transparent;
+      transition: all 0.5s ease;
+    }
+
+    .question-area.easy { border-color: var(--success); }
+    .question-area.mid { border-color: var(--warning); }
+    .question-area.tough { border-color: var(--danger); }
+
+    .level-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .level-badge.easy { background: var(--success); color: #000; }
+    .level-badge.mid { background: var(--warning); color: #000; }
+    .level-badge.tough { background: var(--danger); color: #fff; }
+
+    .question-text {
+      font-size: 1.3rem;
+      line-height: 1.6;
+      color: #fff;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .progress-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      transition: width 0.3s ease;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: progressShimmer 2s infinite;
+    }
+
+    @keyframes progressShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .timer {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 60px;
+      text-align: center;
+      animation: timerPulse 1s ease-in-out infinite;
+    }
+
+    .timer.warning { color: var(--danger); animation: timerUrgent 0.5s ease-in-out infinite; }
+
+    @keyframes timerUrgent {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .option-btn {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 1.2rem;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+    }
+
+    .option-btn.correct {
+      background: var(--success);
+      border-color: var(--success);
+      color: #000;
+      animation: correctPulse 0.6s ease;
+    }
+
+    .option-btn.incorrect {
+      background: var(--danger);
+      border-color: var(--danger);
+      animation: incorrectShake 0.6s ease;
+    }
+
+    .option-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    @keyframes correctPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, var(--primary), var(--warning));
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .lifelines {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .lifeline-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .lifeline-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .lifeline-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .feedback {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback.success { background: rgba(46, 213, 115, 0.2); color: var(--success); }
+    .feedback.error { background: rgba(255, 71, 87, 0.2); color: var(--danger); }
+    .feedback.info { background: rgba(55, 66, 250, 0.2); color: var(--info); }
+
+    .game-end {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 16px;
+      margin: 2rem 0;
+    }
+
+    .final-score {
+      font-family: 'Orbitron', monospace;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 1rem 0;
+    }
+
+    .history {
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+
+    .history-item {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-left: 3px solid var(--primary);
+      background: rgba(255,255,255,0.02);
+      border-radius: 4px;
+    }
+
+    .settings-panel {
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 0.5rem;
+      border-radius: 6px;
+    }
+
+    .achievement {
+      display: inline-block;
+      background: var(--secondary);
+      color: #000;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 0.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .game-title { font-size: 2rem; }
+      .options-grid { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; }
+      .lifelines { justify-content: center; }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="bg-particles"></div>
+  
+  <div class="game-container">
+    <header class="game-header">
+      <h1 class="game-title">Cultural Heritage</h1>
+      <p class="game-subtitle">Test your knowledge of world cultures and heritage sites</p>
+    </header>
+
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-row">
+        <label>Game Mode:</label>
+        <select id="gameModeSelect">
+          <option value="mixed">Mixed Difficulty</option>
+          <option value="progressive">Progressive (Easy→Hard)</option>
+          <option value="easy">Easy Only</option>
+          <option value="mid">Medium Only</option>
+          <option value="tough">Hard Only</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label>Total Questions:</label>
+        <select id="roundsSelect">
+          <option value="5">5 Questions</option>
+          <option value="10" selected>10 Questions</option>
+          <option value="15">15 Questions</option>
+          <option value="20">20 Questions</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label>Sound Effects:</label>
+        <select id="soundToggle">
+          <option value="on" selected>Enabled</option>
+          <option value="off">Disabled</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="game-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="currentRound">0</div>
+        <div class="stat-label">Round</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalRounds">10</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="currentScore">0</div>
+        <div class="stat-label">Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="accuracy">0%</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+    </div>
+
+    <div class="question-area" id="questionArea">
+      <div class="level-badge" id="levelBadge">Ready</div>
+      <div class="question-text" id="questionText">
+        Ready to test your cultural knowledge? Click Start Game to begin your journey through the world's heritage!
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="timer" id="timer">--</div>
+    </div>
+
+    <div class="options-grid" id="optionsGrid"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="controls">
+      <div>
+        <button class="btn btn-primary" id="startBtn">Start Game</button>
+        <button class="btn btn-secondary" id="nextBtn" style="display: none;">Next Question</button>
+        <button class="btn btn-secondary" id="replayBtn" style="display: none;">Play Again</button>
+        <a href="Hub.html" class="btn btn-secondary">Back to Hub</a>
+      </div>
+      
+      <div class="lifelines">
+        <button class="lifeline-btn" id="lifeline5050" title="Remove 2 wrong answers">50/50</button>
+        <button class="lifeline-btn" id="lifelineHint" title="Get a helpful hint">💡 Hint</button>
+        <button class="lifeline-btn" id="lifelineSkip" title="Skip this question">⏭️ Skip</button>
+        <button class="lifeline-btn" id="lifelineFreeze" title="Stop the timer">⏸️ Freeze</button>
+      </div>
+    </div>
+
+    <div id="gameEndScreen" style="display: none;">
+      <div class="game-end">
+        <h2>🎉 Game Complete!</h2>
+        <div class="final-score" id="finalScore">0</div>
+        <div id="performanceText"></div>
+        <div id="achievements"></div>
+      </div>
+    </div>
+
+    <div class="history" id="historyPanel" style="display: none;">
+      <h4>📊 Question History</h4>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <script>
+    class MonumentChallenge {
+      constructor() {
+        this.questions = {
+          easy: [
+            {hint: 'Traditional Japanese theater featuring elaborate costumes and stylized drama.', answer: 'Kabuki', opts: ['Kabuki', 'Noh', 'Bunraku', 'Kyogen']},
+            {hint: 'Colorful Hindu festival celebrated with powders, marking the arrival of spring.', answer: 'Holi', opts: ['Holi', 'Diwali', 'Navratri', 'Pongal']},
+            {hint: 'Ancient Chinese philosophy emphasizing harmony between humans and nature.', answer: 'Taoism', opts: ['Taoism', 'Confucianism', 'Buddhism', 'Legalism']},
+            {hint: 'Traditional Maori war dance performed with rhythmic chanting and stomping.', answer: 'Haka', opts: ['Haka', 'Siva', 'Tamure', 'Ori Tahiti']},
+            {hint: 'This Italian city built on canals is famous for its Carnival masks.', answer: 'Venice', opts: ['Venice', 'Florence', 'Naples', 'Bologna']},
+            {hint: 'Traditional Korean dress characterized by vibrant colors and simple lines.', answer: 'Hanbok', opts: ['Hanbok', 'Kimono', 'Ao Dai', 'Sari']},
+            {hint: 'Ancient Mayan city in Mexico known for its stepped pyramids.', answer: 'Chichen Itza', opts: ['Chichen Itza', 'Teotihuacan', 'Palenque', 'Tikal']},
+            {hint: 'Traditional Russian nested dolls that decrease in size.', answer: 'Matryoshka Dolls', opts: ['Matryoshka Dolls', 'Babushka Dolls', 'Kokoshnik Dolls', 'Lubok Dolls']},
+            {hint: 'This ancient Greek temple is a symbol of classical architecture.', answer: 'Parthenon', opts: ['Parthenon', 'Pantheon', 'Colosseum', 'Acropolis']},
+            {hint: 'Traditional Mexican celebration honoring deceased loved ones.', answer: 'Dia de Muertos', opts: ['Dia de Muertos', 'Cinco de Mayo', 'Posadas', 'Guelaguetza']}
+          ],
+          mid: [
+            {hint: 'Ancient city carved into rose-red cliffs, capital of the Nabataean Kingdom.', answer: 'Petra', opts: ['Petra', 'Jerash', 'Palmyra', 'Baalbek']},
+            {hint: 'Traditional Balinese dance drama telling ancient Hindu epics.', answer: 'Legong', opts: ['Legong', 'Barong', 'Kecak', 'Pendet']},
+            {hint: 'West African oral tradition through musical storytellers called griots.', answer: 'Jeliya', opts: ['Jeliya', 'Gumbe', 'Mbalax', 'Highlife']},
+            {hint: 'Ancient Incan city high in the Andes, known as the "Lost City".', answer: 'Machu Picchu', opts: ['Machu Picchu', 'Cusco', 'Ollantaytambo', 'Sacsayhuaman']},
+            {hint: 'Traditional Turkish art of creating patterns using colored glass tiles.', answer: 'Ebru', opts: ['Ebru', 'Iznik', 'Khatam', 'Zellige']},
+            {hint: 'Cambodian temple complex, largest religious monument in the world.', answer: 'Angkor Wat', opts: ['Angkor Wat', 'Borobudur', 'Bagan', 'Prambanan']},
+            {hint: 'Ancient Persian garden design representing paradise.', answer: 'Charbagh', opts: ['Charbagh', 'Mughal Garden', 'Riyad', 'Hanging Garden']},
+            {hint: 'Traditional Scottish social gathering featuring folk music.', answer: 'Ceilidh', opts: ['Ceilidh', 'Hooley', 'Fling', 'Gathering']},
+            {hint: 'Traditional Chinese art of arranging living spaces harmoniously.', answer: 'Feng Shui', opts: ['Feng Shui', 'Qi Gong', 'Tai Chi', 'Yin Yang']},
+            {hint: 'Traditional Native American gathering with drum circles.', answer: 'Powwow', opts: ['Powwow', 'Potlatch', 'Sun Dance', 'Ghost Dance']},
+            {hint: 'Ancient Egyptian writing system using pictorial symbols.', answer: 'Hieroglyphs', opts: ['Hieroglyphs', 'Cuneiform', 'Linear B', 'Oracle Bones']},
+            {hint: 'Traditional Korean Confucian academies combining education.', answer: 'Seowon', opts: ['Seowon', 'Seodang', 'Sungkyunkwan', 'Hyanggyo']},
+            {hint: 'Traditional Japanese art of repairing pottery with gold.', answer: 'Kintsugi', opts: ['Kintsugi', 'Urushi', 'Raku', 'Maki-e']},
+            {hint: 'Traditional Andean recording device used by the Inca.', answer: 'Quipu', opts: ['Quipu', 'Tokapu', 'Unku', 'Tupu']},
+            {hint: 'Traditional Bhutanese fortress-monasteries serving as centers.', answer: 'Dzong', opts: ['Dzong', 'Gompa', 'Stupa', 'Wat']}
+          ],
+          tough: [
+            {hint: 'Ancient astronomical observatory in India with masonry instruments.', answer: 'Jantar Mantar', opts: ['Jantar Mantar', 'Qutub Minar', 'Charminar', 'Hawa Mahal']},
+            {hint: 'Ethiopian Christian church carved from a single block of rock.', answer: 'Lalibela Churches', opts: ['Lalibela Churches', 'Debre Damo', 'Axum Obelisks', 'Tigray Churches']},
+            {hint: 'Ancient Persian ceremonial capital burned by Alexander.', answer: 'Persepolis', opts: ['Persepolis', 'Pasargadae', 'Susa', 'Ecbatana']},
+            {hint: 'Ancient city in Mali that was a center of Islamic learning.', answer: 'Timbuktu', opts: ['Timbuktu', 'Djenne', 'Gao', 'Mopti']},
+            {hint: 'Ancient Anatolian site with oldest known monumental sculptures.', answer: 'Göbekli Tepe', opts: ['Göbekli Tepe', 'Çatalhöyük', 'Hattusa', 'Troy']},
+            {hint: 'Nabataean water system enabling civilization in desert at Petra.', answer: 'Nabataean Aqueducts', opts: ['Nabataean Aqueducts', 'Roman Aqueducts', 'Qanat System', 'Stepwells']},
+            {hint: 'Traditional Sami singing style evoking people or places.', answer: 'Joik', opts: ['Joik', 'Kulning', 'Tuvan Throat Singing', 'Gregorian Chant']},
+            {hint: 'Ancient Sri Lankan rock fortress with ancient graffiti.', answer: 'Sigiriya', opts: ['Sigiriya', 'Polonnaruwa', 'Anuradhapura', 'Dambulla']},
+            {hint: 'Ancient Mesoamerican ballgame with ritual significance.', answer: 'Ulama', opts: ['Ulama', 'Pok-ta-Pok', 'Pelota', 'Juego de Pelota']},
+            {hint: 'Traditional Berber granaries built into mountainsides.', answer: 'Agadir', opts: ['Agadir', 'Ksar', 'Kasbah', 'Riad']},
+            {hint: 'Ancient Anatolian site, capital of the Hittite Empire.', answer: 'Hattusa', opts: ['Hattusa', 'Troy', 'Catalhoyuk', 'Ephesus']},
+            {hint: 'Indonesian Buddhist temple with nine stacked platforms.', answer: 'Borobudur', opts: ['Borobudur', 'Prambanan', 'Besakih', 'Uluwatu']},
+            {hint: 'Ancient Mesopotamian ziggurat dedicated to moon god Nanna.', answer: 'Great Ziggurat of Ur', opts: ['Great Ziggurat of Ur', 'Etemenanki', 'Chogha Zanbil', 'Ziggurat of Dur-Kurigalzu']},
+            {hint: 'Ancient Nabataean water management system at Petra.', answer: 'Nabataean Aqueducts', opts: ['Nabataean Aqueducts', 'Roman Aqueducts', 'Qanat System', 'Stepwells']},
+            {hint: 'Traditional Korean art of celadon pottery making.', answer: 'Goryeo Celadon', opts: ['Goryeo Celadon', 'Buncheong', 'Baekja', 'Onggi']}
+          ]
+        };
+        
+        this.gameState = {
+          currentRound: 0,
+          totalRounds: 10,
+          score: 0,
+          correctAnswers: 0,
+          currentQuestion: null,
+          gameMode: 'mixed',
+          timeLeft: 0,
+          timer: null,
+          gameStarted: false,
+          gameEnded: false,
+          usedLifelines: { '5050': 0, 'hint': 0, 'skip': 0, 'freeze': 0 },
+          questionHistory: [],
+          achievements: []
+        };
+        
+        this.sounds = {
+          enabled: true,
+          correct: () => this.playTone(800, 0.3, 'sine'),
+          incorrect: () => this.playTone(200, 0.5, 'sawtooth'),
+          tick: () => this.playTone(1000, 0.1, 'square'),
+          gameStart: () => this.playTone(440, 0.5, 'triangle'),
+          gameEnd: () => this.playMelody([440, 554, 659, 880], 0.3)
+        };
+        
+        this.initializeElements();
+        this.bindEvents();
+      }
+      
+      initializeElements() {
+        this.elements = {
+          settingsPanel: document.getElementById('settingsPanel'),
+          gameModeSelect: document.getElementById('gameModeSelect'),
+          roundsSelect: document.getElementById('roundsSelect'),
+          soundToggle: document.getElementById('soundToggle'),
+          currentRound: document.getElementById('currentRound'),
+          totalRounds: document.getElementById('totalRounds'),
+          currentScore: document.getElementById('currentScore'),
+          accuracy: document.getElementById('accuracy'),
+          questionArea: document.getElementById('questionArea'),
+          levelBadge: document.getElementById('levelBadge'),
+          questionText: document.getElementById('questionText'),
+          progressFill: document.getElementById('progressFill'),
+          timer: document.getElementById('timer'),
+          optionsGrid: document.getElementById('optionsGrid'),
+          feedback: document.getElementById('feedback'),
+          startBtn: document.getElementById('startBtn'),
+          nextBtn: document.getElementById('nextBtn'),
+          replayBtn: document.getElementById('replayBtn'),
+          lifeline5050: document.getElementById('lifeline5050'),
+          lifelineHint: document.getElementById('lifelineHint'),
+          lifelineSkip: document.getElementById('lifelineSkip'),
+          lifelineFreeze: document.getElementById('lifelineFreeze'),
+          gameEndScreen: document.getElementById('gameEndScreen'),
+          finalScore: document.getElementById('finalScore'),
+          performanceText: document.getElementById('performanceText'),
+          achievements: document.getElementById('achievements'),
+          historyPanel: document.getElementById('historyPanel'),
+          historyList: document.getElementById('historyList')
+        };
+      }
+      
+      bindEvents() {
+        this.elements.startBtn.addEventListener('click', () => this.startGame());
+        this.elements.nextBtn.addEventListener('click', () => this.nextQuestion());
+        this.elements.replayBtn.addEventListener('click', () => this.resetGame());
+        
+        this.elements.lifeline5050.addEventListener('click', () => this.useLifeline('5050'));
+        this.elements.lifelineHint.addEventListener('click', () => this.useLifeline('hint'));
+        this.elements.lifelineSkip.addEventListener('click', () => this.useLifeline('skip'));
+        this.elements.lifelineFreeze.addEventListener('click', () => this.useLifeline('freeze'));
+        
+        this.elements.soundToggle.addEventListener('change', (e) => {
+          this.sounds.enabled = e.target.value === 'on';
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+      }
+      
+      handleKeyboard(e) {
+        if (!this.gameState.gameStarted || this.gameState.gameEnded) return;
+        
+        const key = e.key;
+        if (['1', '2', '3', '4'].includes(key)) {
+          const optionIndex = parseInt(key) - 1;
+          const options = this.elements.optionsGrid.children;
+          if (options[optionIndex] && !options[optionIndex].disabled) {
+            options[optionIndex].click();
+          }
+        }
+        
+        // Lifeline shortcuts
+        if (e.ctrlKey) {
+          switch(key) {
+            case '1': this.useLifeline('5050'); break;
+            case '2': this.useLifeline('hint'); break;
+            case '3': this.useLifeline('skip'); break;
+            case '4': this.useLifeline('freeze'); break;
+          }
+        }
+      }
+      
+      startGame() {
+        this.resetGameState();
+        this.gameState.gameStarted = true;
+        this.gameState.totalRounds = parseInt(this.elements.roundsSelect.value);
+        this.gameState.gameMode = this.elements.gameModeSelect.value;
+        
+        this.elements.settingsPanel.style.display = 'none';
+        this.elements.startBtn.style.display = 'none';
+        this.elements.nextBtn.style.display = 'inline-block';
+        this.elements.totalRounds.textContent = this.gameState.totalRounds;
+        
+        this.playSound('gameStart');
+        this.nextQuestion();
+      }
+      
+      resetGameState() {
+        this.gameState = {
+          ...this.gameState,
+          currentRound: 0,
+          score: 0,
+          correctAnswers: 0,
+          currentQuestion: null,
+          timeLeft: 0,
+          gameStarted: false,
+          gameEnded: false,
+          usedLifelines: { '5050': 0, 'hint': 0, 'skip': 0, 'freeze': 0 },
+          questionHistory: [],
+          achievements: []
+        };
+        
+        this.clearTimer();
+        this.resetLifelines();
+        this.updateUI();
+      }
+      
+      resetLifelines() {
+        Object.keys(this.gameState.usedLifelines).forEach(lifeline => {
+          const btn = document.getElementById(`lifeline${lifeline === '5050' ? '5050' : lifeline.charAt(0).toUpperCase() + lifeline.slice(1)}`);
+          if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          }
+        });
+      }
+      
+      generateQuestionOrder() {
+        const { gameMode, totalRounds } = this.gameState;
+        let questionPool = [];
+        
+        switch(gameMode) {
+          case 'easy':
+            questionPool = this.questions.easy.slice();
+            break;
+          case 'mid':
+            questionPool = this.questions.mid.slice();
+            break;
+          case 'tough':
+            questionPool = this.questions.tough.slice();
+            break;
+          case 'progressive':
+            const easyCount = Math.ceil(totalRounds * 0.4);
+            const midCount = Math.ceil(totalRounds * 0.4);
+            const toughCount = totalRounds - easyCount - midCount;
+            
+            questionPool = [
+              ...this.getRandomQuestions('easy', easyCount),
+              ...this.getRandomQuestions('mid', midCount),
+              ...this.getRandomQuestions('tough', toughCount)
+            ];
+            break;
+          case 'mixed':
+          default:
+            const perLevel = Math.floor(totalRounds / 3);
+            const remainder = totalRounds % 3;
+            
+            questionPool = [
+              ...this.getRandomQuestions('easy', perLevel + (remainder > 0 ? 1 : 0)),
+              ...this.getRandomQuestions('mid', perLevel + (remainder > 1 ? 1 : 0)),
+              ...this.getRandomQuestions('tough', perLevel)
+            ];
+            this.shuffleArray(questionPool);
+            break;
+        }
+        
+        return questionPool.slice(0, totalRounds);
+      }
+      
+      getRandomQuestions(difficulty, count) {
+        const questions = this.questions[difficulty].slice();
+        this.shuffleArray(questions);
+        return questions.slice(0, count).map(q => ({ ...q, difficulty }));
+      }
+      
+      shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+      
+      nextQuestion() {
+        if (this.gameState.currentRound >= this.gameState.totalRounds) {
+          this.endGame();
+          return;
+        }
+        
+        if (!this.questionOrder) {
+          this.questionOrder = this.generateQuestionOrder();
+        }
+        
+        const question = this.questionOrder[this.gameState.currentRound];
+        this.gameState.currentQuestion = question;
+        this.gameState.currentRound++;
+        
+        this.displayQuestion(question);
+        this.startTimer(question.difficulty);
+        this.updateUI();
+        this.hideFeedback();
+      }
+      
+      displayQuestion(question) {
+        const { difficulty, hint, opts } = question;
+        
+        this.elements.levelBadge.textContent = difficulty.toUpperCase();
+        this.elements.levelBadge.className = `level-badge ${difficulty}`;
+        this.elements.questionArea.className = `question-area ${difficulty}`;
+        this.elements.questionText.textContent = hint;
+        
+        this.elements.optionsGrid.innerHTML = '';
+        const shuffledOpts = [...opts];
+        this.shuffleArray(shuffledOpts);
+        
+        shuffledOpts.forEach((option, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = option;
+          btn.addEventListener('click', () => this.selectAnswer(option, btn));
+          this.elements.optionsGrid.appendChild(btn);
+        });
+      }
+      
+      startTimer(difficulty) {
+        const durations = { easy: 15, mid: 12, tough: 10 };
+        this.gameState.timeLeft = durations[difficulty];
+        
+        this.updateTimer();
+        this.gameState.timer = setInterval(() => {
+          this.gameState.timeLeft--;
+          this.updateTimer();
+          
+          if (this.gameState.timeLeft <= 3 && this.sounds.enabled) {
+            this.playSound('tick');
+          }
+          
+          if (this.gameState.timeLeft <= 0) {
+            this.timeUp();
+          }
+        }, 1000);
+      }
+      
+      updateTimer() {
+        const timeLeft = Math.max(0, this.gameState.timeLeft);
+        this.elements.timer.textContent = `${timeLeft}s`;
+        this.elements.timer.className = timeLeft <= 3 ? 'timer warning' : 'timer';
+        
+        const maxTime = { easy: 15, mid: 12, tough: 10 };
+        const currentDifficulty = this.gameState.currentQuestion?.difficulty || 'mid';
+        const progress = (timeLeft / maxTime[currentDifficulty]) * 100;
+        this.elements.progressFill.style.width = `${progress}%`;
+      }
+      
+      clearTimer() {
+        if (this.gameState.timer) {
+          clearInterval(this.gameState.timer);
+          this.gameState.timer = null;
+        }
+      }
+      
+      timeUp() {
+        this.clearTimer();
+        this.disableAllOptions();
+        this.showFeedback(`⏰ Time's up! The correct answer was: ${this.gameState.currentQuestion.answer}`, 'error');
+        this.recordAnswer(false, 'timeout');
+        this.highlightCorrectAnswer();
+      }
+      
+      selectAnswer(selectedOption, btnElement) {
+        this.clearTimer();
+        const isCorrect = selectedOption === this.gameState.currentQuestion.answer;
+        
+        this.disableAllOptions();
+        
+        if (isCorrect) {
+          this.gameState.correctAnswers++;
+          const points = this.getPoints(this.gameState.currentQuestion.difficulty);
+          this.gameState.score += points;
+          btnElement.classList.add('correct');
+          this.showFeedback(`🎉 Correct! +${points} points`, 'success');
+          this.playSound('correct');
+          this.checkAchievements();
+        } else {
+          btnElement.classList.add('incorrect');
+          this.showFeedback(`❌ Wrong! Correct answer: ${this.gameState.currentQuestion.answer}`, 'error');
+          this.playSound('incorrect');
+          this.highlightCorrectAnswer();
+        }
+        
+        this.recordAnswer(isCorrect, selectedOption);
+        this.updateUI();
+      }
+      
+      getPoints(difficulty) {
+        const points = { easy: 1, mid: 2, tough: 3 };
+        return points[difficulty] || 1;
+      }
+      
+      disableAllOptions() {
+        Array.from(this.elements.optionsGrid.children).forEach(btn => {
+          btn.disabled = true;
+        });
+      }
+      
+      highlightCorrectAnswer() {
+        Array.from(this.elements.optionsGrid.children).forEach(btn => {
+          if (btn.textContent === this.gameState.currentQuestion.answer) {
+            btn.classList.add('correct');
+          }
+        });
+      }
+      
+      recordAnswer(isCorrect, userAnswer) {
+        const record = {
+          round: this.gameState.currentRound,
+          question: this.gameState.currentQuestion.hint,
+          difficulty: this.gameState.currentQuestion.difficulty,
+          correctAnswer: this.gameState.currentQuestion.answer,
+          userAnswer: userAnswer,
+          isCorrect: isCorrect,
+          points: isCorrect ? this.getPoints(this.gameState.currentQuestion.difficulty) : 0
+        };
+        
+        this.gameState.questionHistory.push(record);
+        this.updateHistory();
+      }
+      
+      updateHistory() {
+        const historyHTML = this.gameState.questionHistory.map(record => `
+          <div class="history-item">
+            <strong>Round ${record.round}</strong> (${record.difficulty.toUpperCase()}) 
+            ${record.isCorrect ? '✅' : '❌'} 
+            ${record.userAnswer === 'timeout' ? 'Time Up' : record.userAnswer}
+            ${record.points > 0 ? `(+${record.points}pts)` : ''}
+          </div>
+        `).join('');
+        
+        this.elements.historyList.innerHTML = historyHTML;
+        this.elements.historyPanel.style.display = 'block';
+      }
+      
+      useLifeline(type) {
+        if (this.gameState.usedLifelines[type] > 0) return;
+        if (!this.gameState.currentQuestion) return;
+        
+        this.gameState.usedLifelines[type]++;
+        this.markLifelineUsed(type);
+        
+        switch(type) {
+          case '5050':
+            this.use5050();
+            break;
+          case 'hint':
+            this.useHint();
+            break;
+          case 'skip':
+            this.useSkip();
+            break;
+          case 'freeze':
+            this.useFreeze();
+            break;
+        }
+      }
+      
+      use5050() {
+        const options = Array.from(this.elements.optionsGrid.children);
+        const correctBtn = options.find(btn => btn.textContent === this.gameState.currentQuestion.answer);
+        const wrongBtns = options.filter(btn => btn !== correctBtn);
+        
+        this.shuffleArray(wrongBtns);
+        wrongBtns.slice(0, 2).forEach(btn => {
+          btn.disabled = true;
+          btn.style.opacity = '0.3';
+        });
+        
+        this.showFeedback('💡 50/50 used! Two wrong answers removed.', 'info');
+      }
+      
+      useHint() {
+        const hints = {
+          'Kabuki': 'Features elaborate makeup called kumadori',
+          'Holi': 'Known as the festival of colors',
+          'Taoism': 'Symbolized by the yin-yang',
+          'Haka': 'Performed by New Zealand\'s All Blacks rugby team',
+          'Venice': 'Built on 118 small islands',
+          'Hanbok': 'Has a short jacket called jeogori',
+          'Chichen Itza': 'Has a pyramid called El Castillo',
+          'Matryoshka Dolls': 'First created in 1890s',
+          'Parthenon': 'Built in the 5th century BCE',
+          'Dia de Muertos': 'Features marigold flowers'
+        };
+        
+        const hint = hints[this.gameState.currentQuestion.answer] || 'This is an important cultural tradition!';
+        this.showFeedback(`💡 Hint: ${hint}`, 'info');
+      }
+      
+      useSkip() {
+        this.clearTimer();
+        this.recordAnswer(false, 'skipped');
+        this.showFeedback('⏭️ Question skipped!', 'info');
+        setTimeout(() => this.nextQuestion(), 1500);
+      }
+      
+      useFreeze() {
+        this.clearTimer();
+        this.showFeedback('⏸️ Timer frozen! Take your time.', 'info');
+      }
+      
+      markLifelineUsed(type) {
+        const btnMap = {
+          '5050': this.elements.lifeline5050,
+          'hint': this.elements.lifelineHint,
+          'skip': this.elements.lifelineSkip,
+          'freeze': this.elements.lifelineFreeze
+        };
+        
+        const btn = btnMap[type];
+        if (btn) {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+        }
+      }
+      
+      checkAchievements() {
+        const achievements = [];
+        
+        // Perfect start
+        if (this.gameState.currentRound <= 3 && this.gameState.correctAnswers === this.gameState.currentRound) {
+          achievements.push('🔥 Perfect Start');
+        }
+        
+        // Speed demon
+        if (this.gameState.timeLeft >= 10) {
+          achievements.push('⚡ Speed Demon');
+        }
+        
+        // Difficult master
+        if (this.gameState.currentQuestion.difficulty === 'tough' && this.gameState.correctAnswers > 0) {
+          achievements.push('🧠 Master Mind');
+        }
+        
+        // No lifelines used
+        if (this.gameState.currentRound >= 5 && Object.values(this.gameState.usedLifelines).every(count => count === 0)) {
+          achievements.push('💪 Pure Skill');
+        }
+        
+        achievements.forEach(achievement => {
+          if (!this.gameState.achievements.includes(achievement)) {
+            this.gameState.achievements.push(achievement);
+          }
+        });
+      }
+      
+      showFeedback(message, type) {
+        this.elements.feedback.textContent = message;
+        this.elements.feedback.className = `feedback ${type} show`;
+      }
+      
+      hideFeedback() {
+        this.elements.feedback.className = 'feedback';
+      }
+      
+      updateUI() {
+        this.elements.currentRound.textContent = this.gameState.currentRound;
+        this.elements.currentScore.textContent = this.gameState.score;
+        
+        const accuracy = this.gameState.currentRound > 0 
+          ? Math.round((this.gameState.correctAnswers / this.gameState.currentRound) * 100)
+          : 0;
+        this.elements.accuracy.textContent = `${accuracy}%`;
+      }
+      
+      endGame() {
+        this.gameState.gameEnded = true;
+        this.clearTimer();
+        
+        this.elements.nextBtn.style.display = 'none';
+        this.elements.replayBtn.style.display = 'inline-block';
+        this.elements.gameEndScreen.style.display = 'block';
+        
+        const accuracy = Math.round((this.gameState.correctAnswers / this.gameState.totalRounds) * 100);
+        const maxScore = this.gameState.totalRounds * 2; // Approximate max
+        const performance = this.getPerformanceRating(accuracy);
+        
+        this.elements.finalScore.textContent = this.gameState.score;
+        this.elements.performanceText.innerHTML = `
+          <p><strong>Accuracy:</strong> ${accuracy}% (${this.gameState.correctAnswers}/${this.gameState.totalRounds})</p>
+          <p><strong>Performance:</strong> ${performance.text}</p>
+          <p>${performance.message}</p>
+        `;
+        
+        // Show achievements
+        if (this.gameState.achievements.length > 0) {
+          this.elements.achievements.innerHTML = '<h4>🏆 Achievements</h4>' +
+            this.gameState.achievements.map(achievement => 
+              `<span class="achievement">${achievement}</span>`
+            ).join('');
+        }
+        
+        this.playSound('gameEnd');
+      }
+      
+      getPerformanceRating(accuracy) {
+        if (accuracy >= 90) return { text: '🏆 Cultural Master', message: 'Outstanding knowledge of world heritage!' };
+        if (accuracy >= 80) return { text: '🥇 Heritage Expert', message: 'Excellent performance! You know your cultures well.' };
+        if (accuracy >= 70) return { text: '🥈 Culture Enthusiast', message: 'Good job! Keep exploring to learn more.' };
+        if (accuracy >= 60) return { text: '🥉 Cultural Learner', message: 'Not bad! There\'s still more to discover.' };
+        return { text: '📚 Culture Student', message: 'Keep studying - every expert started somewhere!' };
+      }
+      
+      resetGame() {
+        this.elements.settingsPanel.style.display = 'block';
+        this.elements.startBtn.style.display = 'inline-block';
+        this.elements.nextBtn.style.display = 'none';
+        this.elements.replayBtn.style.display = 'none';
+        this.elements.gameEndScreen.style.display = 'none';
+        this.elements.historyPanel.style.display = 'none';
+        
+        this.elements.questionText.textContent = 'Ready to test your cultural knowledge? Click Start Game to begin your journey through the world\'s heritage!';
+        this.elements.levelBadge.textContent = 'Ready';
+        this.elements.levelBadge.className = 'level-badge';
+        this.elements.questionArea.className = 'question-area';
+        this.elements.optionsGrid.innerHTML = '';
+        this.elements.progressFill.style.width = '0%';
+        this.elements.timer.textContent = '--';
+        this.elements.achievements.innerHTML = '';
+        
+        this.questionOrder = null;
+        this.resetGameState();
+        this.hideFeedback();
+      }
+      
+      playSound(type) {
+        if (!this.sounds.enabled) return;
+        if (this.sounds[type]) {
+          this.sounds[type]();
+        }
+      }
+      
+      playTone(frequency, duration, type = 'sine') {
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+          oscillator.type = type;
+          
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+          
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch (e) {
+          // Audio not supported, fail silently
+        }
+      }
+      
+      playMelody(frequencies, noteDuration) {
+        if (!this.sounds.enabled) return;
+        frequencies.forEach((freq, index) => {
+          setTimeout(() => this.playTone(freq, noteDuration), index * noteDuration * 1000);
+        });
+      }
+    }
+    
+    // Initialize the game when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      new MonumentChallenge();
+    });
+  </script>
+</body>
+</html>

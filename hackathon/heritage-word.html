@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Word Hunt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #4a148c;
+            --secondary: #ff6f00;
+            --accent: #1de9b6;
+            --dark: #1a237e;
+            --bg-1: #0b0220;
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0 }
+        html, body { height: 100%; font-family: 'Poppins', sans-serif; background: radial-gradient(circle at top, var(--bg-1), #000511); color: var(--text); }
+
+        /* particles background (subtle) */
+        .particles { position: fixed; inset: 0; z-index: -1; pointer-events: none }
+        .particle { position: absolute; border-radius: 50%; background: var(--accent); opacity: 0.6; animation: float 15s linear infinite }
+        @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0 } 10% { opacity: 0.7 } 90% { opacity: 0.7 } 100% { transform: translateY(-100px) rotate(360deg); opacity: 0 } }
+
+        header { text-align: center; padding: 2.5rem 1rem 1.2rem; background: linear-gradient(to bottom, rgba(26, 0, 51, 0.9), transparent); position: relative; z-index: 10 }
+        .logo { font-size: 2.6rem; color: var(--accent); display: inline-block; margin-bottom: .5rem; text-shadow: 0 0 12px rgba(29,233,182,0.35) }
+    h1 { font-size: 2.4rem; margin: .25rem 0; background: linear-gradient(45deg, var(--accent), var(--secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent }
+        .subtitle { color: rgba(255,255,255,0.85); max-width: 900px; margin: 0 auto 1rem }
+
+        .game-container { max-width: 1200px; margin: 1.25rem auto; padding: 1rem }
+
+        /* Hub-style play button */
+        .play-btn { display: inline-block; padding: .6rem 1rem; border-radius: 10px; background: linear-gradient(45deg, var(--primary), var(--dark)); color: #fff; text-decoration: none; margin-top: 8px; transition: all .25s }
+        .play-btn::before { content: ''; position: absolute; } /* kept minimal for layout parity */
+        .play-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.35) }
+
+        /* layout */
+        .game-section { display: grid; grid-template-columns: 1fr 360px; gap: 1.25rem; align-items: start }
+        @media (max-width: 920px) { .game-section { grid-template-columns: 1fr } }
+
+        /* glass card styles (hub-like) */
+        .card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 14px; padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.35) }
+
+        .word-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 6px; padding: 1rem; border-radius: 10px }
+        .grid-cell { width: 100%; padding-top: 100%; position: relative; background: rgba(255,255,255,0.03); border-radius: 8px; cursor: pointer; transition: all .18s; box-shadow: inset 0 -6px 12px rgba(0,0,0,0.12) }
+        .grid-cell > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem }
+        .grid-cell.selected { background: linear-gradient(135deg, var(--accent), var(--secondary)); transform: scale(.985) }
+        .grid-cell.found { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: #04102a }
+
+        .word-list { display: flex; flex-direction: column; gap: .6rem }
+        .word-item { padding: .8rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.02); display:flex;align-items:center;justify-content:space-between }
+        .word-item.found { opacity: .75; text-decoration: line-through; background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)) }
+
+        .controls { display: flex; gap: .75rem; justify-content: center; margin-top: 1rem }
+        .control-button { padding: .9rem 1.25rem; border-radius: 999px; border: 0; background: linear-gradient(45deg, var(--accent), var(--secondary)); color: #04102a; font-weight: 700; cursor: pointer }
+        .control-button:hover { transform: translateY(-3px) }
+
+        .stats { display: flex; justify-content: space-around; margin: 1rem 0; padding: .6rem; border-radius: 10px; background: rgba(255,255,255,0.02) }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent) }
+
+        .win-screen { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); z-index: 1200 }
+        .win-content { width: min(680px,92%); padding: 1.4rem; border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)) }
+
+        .hint-button { padding: .4rem .6rem; border-radius: 8px; background: rgba(255,255,255,0.04); border: 0; color: var(--text); cursor: pointer }
+
+        /* responsive tweaks */
+        @media (max-width:520px) { h1 { font-size: 1.6rem } .play-btn { padding: .5rem .7rem } .grid-cell > span { font-size: 0.8rem } }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+
+    <div class="game-container">
+        <header>
+            <div class="logo">🕌</div>
+            <h1>Cultural Heritage — Word Hunt</h1>
+            <p class="subtitle">Find words related to India's rich cultural heritage</p>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+                <a class="play-btn" href="Hub.html">🎮 Games Hub</a>
+                <a class="play-btn" href="index.html">⟵ Main Hub</a>
+            </div>
+        </header>
+
+        
+
+        <div class="game-section" style="margin-top:1rem">
+            <div class="card">
+                <div id="wordGrid" class="word-grid"></div>
+            </div>
+
+            <aside class="card">
+                <div id="wordList" class="word-list">
+                    <h3>Words to Find:</h3>
+                </div>
+                <div class="stats" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.03)">
+                    <div class="stats-grid" style="display:flex;justify-content:space-between;gap:8px">
+                        <div class="stat-item" style="flex:1;text-align:center">
+                            <div class="stat-value" id="wordsFound">0</div>
+                            <div class="stat-label">Words Found</div>
+                        </div>
+                        <div class="stat-item" style="flex:1;text-align:center">
+                            <div class="stat-value" id="totalWords">0</div>
+                            <div class="stat-label">Total Words</div>
+                        </div>
+                        <div class="stat-item" style="flex:1;text-align:center">
+                            <div class="stat-value" id="timeElapsed">0:00</div>
+                            <div class="stat-label">Time</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="controls">
+            <button class="control-button" onclick="newGame()">New Game</button>
+            <button class="control-button" onclick="showHint()">Get Hint</button>
+        </div>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-content">
+            <h2>Congratulations!</h2>
+            <p>You found all the words!</p>
+            <p>Time: <span id="finalTime">0:00</span></p>
+            <button class="control-button" onclick="newGame()">Play Again</button>
+        </div>
+    </div>
+
+    
+
+    <script>
+        const wordLists = [
+            {
+                theme: "Monuments",
+                words: [
+                    { word: "TAJMAHAL", hint: "Symbol of eternal love in Agra" },
+                    { word: "REDFORT", hint: "Mughal fortress in Delhi" },
+                    { word: "QUTUBMINAR", hint: "Victory tower of Delhi" },
+                    { word: "GATEWAY", hint: "Mumbai's iconic arch monument" },
+                    { word: "KONARK", hint: "Famous sun temple in Odisha" }
+                ]
+            },
+            {
+                theme: "Culture",
+                words: [
+                    { word: "DIWALI", hint: "Festival of lights" },
+                    { word: "BHARATANATYAM", hint: "Classical dance form" },
+                    { word: "YOGA", hint: "Ancient spiritual practice" },
+                    { word: "RANGOLI", hint: "Colorful floor art" },
+                    { word: "KATHAK", hint: "North Indian classical dance" }
+                ]
+            },
+            {
+                theme: "Heritage",
+                words: [
+                    { word: "SANSKRIT", hint: "Ancient Indian language" },
+                    { word: "AYURVEDA", hint: "Traditional medicine system" },
+                    { word: "VEDAS", hint: "Ancient sacred texts" },
+                    { word: "CLASSICAL", hint: "Traditional art forms" },
+                    { word: "HERITAGE", hint: "Cultural inheritance" }
+                ]
+            }
+        ];
+
+        let currentWords = [];
+        let foundWords = [];
+        let grid = [];
+        let gridSize = 15;
+        let selection = [];
+        let startTime;
+        let timerInterval;
+
+        function initializeGame() {
+            const themeIndex = Math.floor(Math.random() * wordLists.length);
+            currentWords = [...wordLists[themeIndex].words];
+            foundWords = [];
+            selection = [];
+            document.getElementById('totalWords').textContent = currentWords.length;
+            document.getElementById('wordsFound').textContent = '0';
+            createGrid();
+            displayWordList();
+            startTimer();
+        }
+
+        function createGrid() {
+            grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
+            const wordGrid = document.getElementById('wordGrid');
+            wordGrid.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            
+            // Place words
+            currentWords.forEach(({word}) => placeWord(word));
+            
+            // Fill empty cells
+            for(let i = 0; i < gridSize; i++) {
+                for(let j = 0; j < gridSize; j++) {
+                    if(grid[i][j] === '') {
+                        grid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    }
+                }
+            }
+            
+            // Create grid HTML
+            wordGrid.innerHTML = '';
+            for(let i = 0; i < gridSize; i++) {
+                for(let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    const span = document.createElement('span'); span.textContent = grid[i][j];
+                    cell.appendChild(span);
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('mousedown', startSelection);
+                    cell.addEventListener('mouseover', updateSelection);
+                    cell.addEventListener('mouseup', endSelection);
+                    wordGrid.appendChild(cell);
+                }
+            }
+        }
+
+        function placeWord(word) {
+            const directions = [
+                [0, 1],   // horizontal
+                [1, 0],   // vertical
+                [1, 1],   // diagonal
+                [-1, 1],  // diagonal up
+            ];
+            
+            let placed = false;
+            while(!placed) {
+                const direction = directions[Math.floor(Math.random() * directions.length)];
+                const length = word.length;
+                
+                let row = Math.floor(Math.random() * gridSize);
+                let col = Math.floor(Math.random() * gridSize);
+                
+                if(canPlaceWord(word, row, col, direction)) {
+                    placeWordAt(word, row, col, direction);
+                    placed = true;
+                }
+            }
+        }
+
+        function canPlaceWord(word, row, col, [dy, dx]) {
+            const length = word.length;
+            
+            // Check if word fits in grid
+            if(row + dy * (length - 1) < 0 || row + dy * (length - 1) >= gridSize ||
+               col + dx * (length - 1) < 0 || col + dx * (length - 1) >= gridSize) {
+                return false;
+            }
+            
+            // Check if path is clear
+            for(let i = 0; i < length; i++) {
+                const currentCell = grid[row + dy * i][col + dx * i];
+                if(currentCell !== '' && currentCell !== word[i]) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function placeWordAt(word, row, col, [dy, dx]) {
+            for(let i = 0; i < word.length; i++) {
+                grid[row + dy * i][col + dx * i] = word[i];
+            }
+        }
+
+        function displayWordList() {
+            const wordList = document.getElementById('wordList');
+            if(!wordList) return;
+            wordList.innerHTML = '<h3>Words to Find:</h3>';
+            currentWords.forEach(({word, hint}) => {
+                const wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                wordItem.dataset.word = word;
+                wordItem.innerHTML = `
+                    ${word}
+                    <button class="hint-button" onclick="showWordHint('${word}')">?</button>
+                    <div class="word-info" id="hint-${word}">${hint}</div>
+                `;
+                wordList.appendChild(wordItem);
+            });
+        }
+
+        function showWordHint(word) {
+            const hintElement = document.getElementById(`hint-${word}`);
+            hintElement.style.display = hintElement.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function startSelection(e) {
+            const cell = e.target.closest('.grid-cell');
+            if(!cell) return;
+            selection = [cell];
+            cell.classList.add('selected');
+        }
+
+        function updateSelection(e) {
+            if(selection.length === 0) return;
+            const lastCell = selection[selection.length - 1];
+            const currentCell = e.target.closest ? e.target.closest('.grid-cell') : null;
+            if(!currentCell) return;
+            if(isAdjacent(lastCell, currentCell)) {
+                if(!selection.includes(currentCell)) {
+                    selection.push(currentCell);
+                    currentCell.classList.add('selected');
+                }
+            }
+        }
+
+        function endSelection() {
+            const word = selection.map(cell => (cell.querySelector('span')?.textContent || '')).join('');
+            const reversedWord = word.split('').reverse().join('');
+            
+            const foundWord = currentWords.find(({word: w}) => 
+                w === word || w === reversedWord
+            );
+            
+            if(foundWord && !foundWords.includes(foundWord.word)) {
+                foundWords.push(foundWord.word);
+                selection.forEach(cell => cell.classList.add('found'));
+                updateWordList();
+                
+                if(foundWords.length === currentWords.length) {
+                    gameWon();
+                }
+            }
+            
+            selection.forEach(cell => cell.classList.remove('selected'));
+            selection = [];
+        }
+
+        function isAdjacent(cell1, cell2) {
+            const row1 = parseInt(cell1.dataset.row);
+            const col1 = parseInt(cell1.dataset.col);
+            const row2 = parseInt(cell2.dataset.row);
+            const col2 = parseInt(cell2.dataset.col);
+            
+            return Math.abs(row1 - row2) <= 1 && Math.abs(col1 - col2) <= 1;
+        }
+
+        function updateWordList() {
+            document.getElementById('wordsFound').textContent = foundWords.length;
+            document.querySelectorAll('.word-item').forEach(item => {
+                const word = item.dataset.word;
+                if(foundWords.includes(word)) {
+                    item.classList.add('found');
+                }
+            });
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timeElapsed').textContent = timeString;
+        }
+
+        function gameWon() {
+            clearInterval(timerInterval);
+            const finalTime = document.getElementById('timeElapsed').textContent;
+            document.getElementById('finalTime').textContent = finalTime;
+            document.getElementById('winScreen').style.display = 'flex';
+        }
+
+        function showHint() {
+            const remainingWords = currentWords.filter(({word}) => !foundWords.includes(word));
+            if(remainingWords.length === 0) return;
+            
+            const randomWord = remainingWords[Math.floor(Math.random() * remainingWords.length)];
+            const hintElement = document.getElementById(`hint-${randomWord.word}`);
+            hintElement.style.display = 'block';
+            setTimeout(() => {
+                hintElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function newGame() {
+            document.getElementById('winScreen').style.display = 'none';
+            initializeGame();
+        }
+
+        // Start game when page loads
+        window.onload = initializeGame;
+    </script>
+</body>
+</html>

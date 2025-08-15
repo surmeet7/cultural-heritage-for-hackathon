@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Heritage Hub — Mixed Edition</title>
+  <style>
+      :root{ 
+        --container:1100px; 
+        --primary: #4a148c;
+        --secondary: #ff6f00;
+        --accent: #1de9b6;
+        --dark: #1a237e;
+        --light: #f5f5f5;
+        /* color tokens (themeable) */
+        --bg-gradient: radial-gradient(circle at top, #1a0033, #000511);
+        --bg-color: #04030a;
+        --text-color: #ffffff;
+        --muted: rgba(255, 255, 255, 0.7);
+        --glass-bg: rgba(255, 255, 255, 0.06);
+        --glass-border: rgba(255, 255, 255, 0.12);
+      }
+
+      /* Light theme overrides */
+      :root[data-theme="light"], [data-theme="light"] {
+        --bg-gradient: linear-gradient(180deg,#ffffff,#f3f6fb);
+        --bg-color: #ffffff;
+        --text-color: #0b1020;
+        --muted: rgba(11,16,32,0.6);
+        --glass-bg: rgba(255,255,255,0.7);
+        --glass-border: rgba(11,16,32,0.06);
+      }
+
+      /* Dark theme overrides */
+      :root[data-theme="dark"], [data-theme="dark"] {
+        --bg-gradient: radial-gradient(circle at top, #0b0220, #00040a);
+        --bg-color: #03040a;
+        --text-color: #ffffff;
+        --muted: rgba(255,255,255,0.68);
+        --glass-bg: rgba(255,255,255,0.04);
+        --glass-border: rgba(255,255,255,0.08);
+      }
+
+      /* Search styles */
+      .search-box {
+        position: relative;
+        max-width: 600px;
+        margin: 20px auto;
+        display: flex;
+        gap: 10px;
+      }
+
+      #searchInput {
+        flex: 1;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid var(--accent);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      #searchButton {
+        padding: 12px 24px;
+        background: var(--accent);
+        color: black;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      #searchButton:hover {
+        opacity: 0.9;
+      }
+
+      .search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 5px;
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid var(--accent);
+        border-radius: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
+        z-index: 1000;
+      }
+
+      .search-dropdown.active {
+        display: block;
+      }
+
+      .search-item {
+        padding: 10px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        color: white;
+      }
+
+      .search-item:hover {
+        background: rgba(29, 233, 182, 0.2);
+      }
+
+      .search-item-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .search-item-desc {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      html,body{
+        height:100%;
+        margin:0;
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body{
+        background: var(--bg-gradient);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        padding:18px;
+        position:relative;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: var(--accent);
+        opacity: 0.6;
+        animation: float 15s infinite linear;
+      }
+
+      @keyframes float {
+        0% {
+            transform: translateY(0) translateX(0);
+        }
+        50% {
+            transform: translateY(-20px) translateX(10px);
+        }
+        100% {
+            transform: translateY(0) translateX(0);
+        }
+      }
+      
+      /* Search bar styles */
+      .search-container {
+        position: relative;
+        max-width: 600px;
+        margin: 20px auto;
+      }
+
+      .search-wrapper {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 5px;
+      }
+
+      #searchInput {
+        flex: 1;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid var(--accent);
+        border-radius: 10px;
+        background: var(--glass-bg);
+        color: var(--text-color);
+  }
+
+      #searchButton {
+        padding: 12px 24px;
+        background: var(--accent);
+        color: var(--bg-color);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      
+
+      .search-button:hover {
+        background: var(--accent);
+        color: var(--bg-color);
+        box-shadow: 0 0 20px rgba(29, 233, 182, 0.3);
+      }
+
+      .button-icon {
+        font-size: 1.2rem;
+      }
+
+      .button-text {
+        font-weight: 500;
+      }
+      .search-input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 20px rgba(29, 233, 182, 0.2);
+        border-radius: 12px 12px 0 0;
+      }
+
+      .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 0 0 12px 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .search-results.active {
+        display: block;
+      }
+
+      .search-result-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--glass-border);
+        transition: background-color 0.2s;
+      }
+
+      .search-result-item:last-child {
+        border-bottom: none;
+      }
+
+      .search-result-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .result-title {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 4px;
+      }
+
+      .result-description {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      
+      
+      .search-results.active {
+        display: block;
+        border-color: var(--accent);
+        box-shadow: 0 4px 20px rgba(29, 233, 182, 0.2);
+      }
+
+      .search-result-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--glass-border);
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .search-result-item:last-child {
+        border-bottom: none;
+      }
+
+      .search-result-item:hover {
+        background: rgba(29, 233, 182, 0.1);
+      }
+
+      .search-result-title {
+        color: var(--text-color);
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      .search-result-description {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .search-result-match {
+        color: var(--accent);
+      }
+      
+      /* Theme toggle styles */
+      .theme-toggle {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(8px);
+        border: 2px solid rgba(255,255,255,0.1);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .theme-toggle:hover {
+        background: rgba(255,255,255,0.2);
+      }
+
+      /* Header action buttons placed under the headline */
+      .header-actions { margin-top:12px; display:flex; gap:12px; flex-wrap:wrap }
+      .header-action {
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 14px; background:var(--glass-bg); color:var(--text-color);
+        border:1px solid var(--glass-border); border-radius:10px; text-decoration:none;
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        transition: transform .18s ease, box-shadow .18s ease;
+        font-weight:600;
+      }
+      .header-action:hover{ transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
+
+      .flag-bg{position:fixed;inset:0;z-index:-2;background-image:var(--flag-image), linear-gradient(120deg, #FF9933 0%, #FFFFFF 50%, #2E7D32 100%);background-size:cover;background-position:center center;background-repeat:no-repeat;filter:blur(14px) brightness(0.85) saturate(0.95);transform:scale(1.02)}
+  .overlay-gradient{position:fixed;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.22));z-index:-1}
+  /* Grid layout for slides (3x2) */
+  .carousel{
+    overflow:visible;
+    position:relative;
+    padding: 60px 0;
+    margin: 60px 0;
+  }
+  .carousel-track{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .carousel .slide{
+    position: relative;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 6px 18px rgba(2,6,23,0.08);
+    transition:all 0.5s cubic-bezier(.2,.9,.4,1);
+    transform-origin:center;
+    position:relative;
+    z-index:1;
+  }
+  .carousel .slide:hover{
+    transform:scale(3.5) translateY(-10px);
+    z-index:100;
+    box-shadow:0 30px 70px rgba(2,6,23,0.3);
+  }
+  .carousel .slide img{width:100%;height:400px;object-fit:cover;border-radius:16px}
+  .carousel .slide img{transition: transform 0.45s cubic-bezier(.2,.9,.25,1);} 
+  .carousel .slide:hover img{transform: scale(0.88);} 
+  @media (max-width:1200px){ .carousel .slide img{height:300px} .carousel .slide{min-width:calc(100% - 40px)!important} }
+  /* Glass-effect for slides: frosted backdrop + subtle hover sheen */
+  .carousel .slide{
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px) saturate(1.8);
+    -webkit-backdrop-filter: blur(10px) saturate(1.8);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(.2,.9,.4,1);
+    position: relative; 
+    overflow: hidden;
+    transform-origin: center center;
+    z-index: 1;
+  }
+  /* image-specific transitions and zoom-out on hover */
+  .carousel .slide img{
+    transition: transform .35s ease, filter .35s ease;
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .carousel .slide:hover img{
+    transform: scale(0.95);
+  }
+  .carousel .slide:hover {
+    transform: scale(3.5);
+    z-index: 10;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    border-color: var(--accent);
+  }
+
+  /* Special case: Games Hub slide should zoom out on hover instead of zooming in */
+  .carousel .slide[href="Hub.html"] {
+    transition: transform 0.4s cubic-bezier(.2,.9,.4,1), box-shadow 0.4s ease;
+  }
+  .carousel .slide[href="Hub.html"] img { transition: transform 0.45s cubic-bezier(.2,.9,.4,1); transform-origin: center; }
+  .carousel .slide[href="Hub.html"]:hover { transform: scale(0.95) !important; z-index: 12; box-shadow: 0 12px 30px rgba(0,0,0,0.25) !important; border-color: var(--glass-border) !important; }
+  .carousel .slide[href="Hub.html"]:hover img { transform: scale(0.9); }
+  /* frosted glass overlay that blurs the image beneath while keeping text sharp */
+  .carousel .slide::before{
+    content: '';
+    position: absolute; inset:0; pointer-events: none; z-index:1;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(8px) saturate(1.05);
+    -webkit-backdrop-filter: blur(8px) saturate(1.05);
+    transition: background .35s ease, backdrop-filter .35s ease;
+  }
+  /* subtle sheen on hover kept as ::after */
+  .carousel .slide::after{
+    content: '';
+    position: absolute; inset:0; pointer-events: none; z-index:2;
+    background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.02) 100%);
+    transform: translateX(-100%);
+    transition: transform .9s cubic-bezier(.2,.9,.25,1);
+  }
+  .carousel .slide:hover::after{ transform: translateX(0%); }
+  /* ensure slide inner content (text/buttons) sits above overlays */
+  .carousel .slide > * { position: relative; z-index:3 }
+  .carousel .slide:hover{ transform: translateY(-6px); box-shadow: 0 18px 48px rgba(2,6,23,0.18); }
+  .carousel .slide:hover::after{ transform: translateX(0%); }
+      .container{max-width:var(--container);margin:0 auto}
+      header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+      .brand{display:flex;align-items:center;gap:12px}
+      .logo{width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#e85a0c);display:grid;place-items:center;font-weight:800;color:#fff;font-size:20px}
+      .grid-xl{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+      .panel{background:#fff;border-radius:8px;padding:10px;box-shadow:0 1px 4px rgba(6,24,44,0.08)}
+      .card{background:#fff;border-radius:8px;padding:8px;box-shadow:0 1px 6px rgba(6,24,44,0.06);display:flex;gap:12px}
+      .media img{width:96px;height:64px;object-fit:cover;border-radius:6px}
+      .btn-primary{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:6px;cursor:pointer}
+  .btn-ghost{background:transparent;border:1px solid var(--glass-border);padding:6px 8px;border-radius:6px;cursor:pointer}
+      .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center}
+      .modal.show{display:flex}
+      /* Staggered fade-up animation (copied from index.html) */
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px) scale(0.995); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .animate-item { opacity: 0; }
+      .animate-item.is-visible { animation: fadeUp 700ms cubic-bezier(.2,.9,.25,1) forwards; }
+    </style>
+  </head>
+  <body>
+    <div class="particles" aria-hidden="true">
+      <div class="particle" style="width:2px;height:2px;left:10%;top:20%"></div>
+      <div class="particle" style="width:3px;height:3px;left:20%;top:40%"></div>
+      <div class="particle" style="width:2px;height:2px;left:30%;top:60%"></div>
+      <div class="particle" style="width:4px;height:4px;left:40%;top:25%"></div>
+      <div class="particle" style="width:2px;height:2px;left:50%;top:45%"></div>
+      <div class="particle" style="width:3px;height:3px;left:60%;top:65%"></div>
+      <div class="particle" style="width:2px;height:2px;left:70%;top:35%"></div>
+      <div class="particle" style="width:4px;height:4px;left:80%;top:55%"></div>
+      <div class="particle" style="width:2px;height:2px;left:90%;top:30%"></div>
+      <div class="particle" style="width:3px;height:3px;left:95%;top:50%"></div>
+    </div>
+    <div class="container">
+      <main>
+        <header>
+          <div class="brand">
+            <div>
+              <h1 style="margin:0;font-size:34px;font-weight:700">Cultural Heritage of India</h1>
+              <div style="font-size:15px;color:var(--muted);margin-top:6px"><em>Discover the Timeless Beauty &amp; Rich Legacy</em></div>
+              
+            </div>
+          </div>
+          <!-- header actions moved below headline -->
+        </header>
+        <div class="header-actions container" style="max-width:var(--container)">
+          <a href="index.html" class="header-action">⟵ Explore more</a>
+          <a href="Hub.html" class="header-action">🎮 Games Hub</a>
+          <a href="teamintro.html" class="header-action" title="Explore more">👥 Team Intro</a>
+          <button id="themeToggle" class="header-action" aria-label="Toggle theme">
+            <span class="light-icon">🌞</span>
+            <span class="dark-icon" style="display:none">🌙</span>
+          </button>
+        </div>
+        </header>
+        <div class="search-container">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search heritage sites...">
+            <button id="searchButton">
+              <span class="button-icon">🔍</span>
+              <span class="button-text">Search</span>
+            </button>
+          </div>
+          <div id="searchResults" class="search-results"></div>
+        </div>
+        <!-- page content starts -->
+        <!-- Carousel: 6 slides (Kaziranga, Red Fort, India Gate, Taj Mahal, Quiz, Game Bar) -->
+        <div class="carousel" id="mainCarousel2" aria-roledescription="carousel" style="margin-bottom:20px;position:relative">
+          <div class="carousel-track">
+            <a class="slide" href="kaziranga.html" style="min-width:260px;flex:0 0 260px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px;border-radius:8px;text-decoration:none;color:#091827">
+              <img src="https://www.kaziranganationalpark-india.com/blog/wp-content/uploads/2024/02/kaziranga-rhino.jpg" alt="Kaziranga" style="width:100%;height:130px;object-fit:cover;border-radius:6px"/>
+              <strong style="display:block;margin-top:8px">Kaziranga National Park</strong>
+              <span style="color:#6b7280;font-size:.9rem">Famed for the one-horned rhinoceros — explore wildlife and conservation.</span>
+            </a>
+            <a class="slide" href="red.html" style="min-width:260px;flex:0 0 260px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px;border-radius:8px;text-decoration:none;color:#091827">
+              <img src="https://wanderwisdom.com/.image/c_limit%2Ccs_srgb%2Cq_auto:good%2Cw_700/MjAzNDMwNzE1ODA1NjcyNzk2/fort-agra-easy-peasy.webp" alt="Red Fort" style="width:100%;height:130px;object-fit:cover;border-radius:6px"/>
+              <strong style="display:block;margin-top:8px">Red Fort</strong>
+              <span style="color:#6b7280;font-size:.9rem">Mughal citadel and symbol of national heritage.</span>
+            </a>
+            <a class="slide" href="indiagate.html" style="min-width:260px;flex:0 0 260px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px;border-radius:8px;text-decoration:none;color:#091827">
+              <img src="https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1" alt="India Gate" style="width:100%;height:130px;object-fit:cover;object-position:50% 10%;border-radius:6px"/>
+              <strong style="display:block;margin-top:8px">India Gate</strong>
+              <span style="color:#6b7280;font-size:.9rem">A national memorial located in New Delhi.</span>
+            </a>
+            <a class="slide" href="taj.html" style="min-width:260px;flex:0 0 260px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px;border-radius:8px;text-decoration:none;color:#091827">
+              <img src="https://images.pexels.com/photos/3881104/pexels-photo-3881104.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1" alt="Taj Mahal" style="width:100%;height:130px;object-fit:cover;object-position:50% 20%;border-radius:6px"/>
+              <strong style="display:block;margin-top:8px">Taj Mahal</strong>
+              <span style="color:#6b7280;font-size:.9rem">The iconic Mughal mausoleum — symbol of love and artistry.</span>
+            </a>
+            <a class="slide" href="culture.html" style="min-width:260px;flex:0 0 260px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px;border-radius:8px;text-decoration:none;color:#091827">
+              <img src="https://cdn11.bigcommerce.com/s-x49po/images/stencil/1500x1500/products/28864/41545/IndianCulture_na_800_1630_9449X9449_0__63868.1519388909.jpg?c=2" alt="Different Cultures of India" style="width:100%;height:130px;object-fit:cover;border-radius:6px"/>
+              <strong style="display:block;margin-top:8px">Different Cultures of India</strong>
+              <span style="color:#6b7280;font-size:.9rem">Explore regional traditions, festivals and cultural practices through interactive content.</span>
+            </a>
+            <a class="slide" href="Hub.html" style="text-decoration:none;color:#091827" aria-label="Open Games Hub">
+              <img src="https://snipstock.com/wp-content/uploads/2024/05/freshuelle_erstelle_ein_simples_Logo_einfarbig_mit_dem_Namen_Ga_55a153ab-aa48-462d-93a0-783b7517f7e7-400x400.png" alt="Games Hub thumbnail" style="width:100%;height:130px;object-fit:cover;border-radius:6px"/>
+              <strong style="display:block;margin-top:8px">Games Hub</strong>
+              <span style="color:#6b7280;font-size:.9rem">Play quizzes, puzzles and memory games — open the full Games Hub.</span>
+            </a>
+          </div>
+        </div>
+
+
+  <!-- achievements removed -->
+
+        <footer>
+          <div style="display:flex;justify-content:center;align-items:center;padding:12px;color:var(--muted)">
+            Created By Team SIKANDRA
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <!-- modal -->
+    <div id="modal2" class="modal" aria-hidden="true">
+      <div class="modal-inner" role="dialog" aria-modal="true">
+        <button id="modalClose2" class="btn-ghost" style="float:right">Close</button>
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:12px">
+          <div>
+            <div style="height:360px;background:#000;border-radius:8px;overflow:hidden"><img id="modalImg2" src="" alt="Preview" style="width:100%;height:100%;object-fit:cover"/></div>
+            <h3 id="modalName2" style="margin-top:8px">Title</h3>
+            <p id="modalDesc2" style="color:var(--muted)">Description</p>
+          </div>
+          <aside>
+            <div class="panel">
+              <h4>Details</h4>
+              <div id="modalInfo2" style="color:var(--muted)"></div>
+              <div style="margin-top:10px">
+                <button id="modalPlay2" class="btn-primary">Play</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // single clean script: search, rendering, theme, interactions
+      (function(){
+        // --- data ---
+        const heritageData = [
+          { title: 'Kaziranga National Park', description: 'Home to the one-horned rhinoceros and diverse wildlife', url: 'kaziranga.html', keywords:['wildlife','rhino','assam'] },
+          { title: 'Red Fort', description: 'Mughal-era fortress and symbol of Indian independence', url: 'red.html', keywords:['delhi','mughal','fort'] },
+          { title: 'India Gate', description: 'War memorial and iconic landmark of New Delhi', url: 'indiagate.html', keywords:['delhi','memorial'] },
+          { title: 'Taj Mahal', description: 'UNESCO World Heritage site and symbol of eternal love', url: 'taj.html', keywords:['agra','mughal','marble'] },
+          { title: 'Different Cultures of India', description: 'Explore regional traditions, festivals and cultural practices through interactive quizzes', url: 'culture.html', keywords:['quiz','culture','traditions'] },
+          { title: 'Games Hub', description: 'Play quizzes, puzzles and memory games in the full Games Hub', url: 'Hub.html', keywords:['games','quiz','puzzle','memory'] }
+        ];
+
+        // --- helpers ---
+        const $ = s => document.querySelector(s);
+        const $$ = s => Array.from(document.querySelectorAll(s));
+
+        function highlight(text, term){ if(!term) return text; return text.replace(new RegExp(`(${term})`,'gi'), '<span class="search-result-match">$1</span>'); }
+
+        // --- DOM refs ---
+        const searchInput = $('#searchInput');
+        const searchButton = $('#searchButton');
+        const searchResults = $('#searchResults');
+        const carouselSlides = $$('.carousel .slide');
+
+        if(!searchInput || !searchButton || !searchResults) return; // safety
+
+        // --- rendering search results ---
+        function renderResults(matches, term){
+          searchResults.innerHTML = '';
+          if(matches.length===0){
+            const no = document.createElement('div'); no.className='search-result-item'; no.textContent='No results found';
+            searchResults.appendChild(no);
+            searchResults.classList.add('active');
+            return;
+          }
+          for(const p of matches){
+            const item = document.createElement('div'); item.className='search-result-item';
+            item.innerHTML = `<div class="search-result-title">${highlight(p.title,term)}</div><div class="search-result-description">${highlight(p.description,term)}</div>`;
+            item.addEventListener('click', ()=> window.location.href = p.url);
+            searchResults.appendChild(item);
+          }
+          searchResults.classList.add('active');
+        }
+
+        // --- perform search ---
+        function performSearch(){
+          const term = (searchInput.value||'').toLowerCase().trim();
+          // reset slides if empty
+          if(!term){
+            carouselSlides.forEach(s=>{ s.style.opacity='1'; s.style.transform='none'; });
+            searchResults.classList.remove('active');
+            return;
+          }
+
+          // filter slides visually
+          carouselSlides.forEach(s=>{
+            const txt = (s.textContent||'').toLowerCase();
+            const alt = (s.querySelector('img')?.alt||'').toLowerCase();
+            if(txt.includes(term) || alt.includes(term)) { s.style.opacity='1'; s.style.transform='none'; }
+            else { s.style.opacity='0.2'; s.style.transform='scale(0.95)'; }
+          });
+
+          // find matches in heritageData
+          const matches = heritageData.filter(p=> p.title.toLowerCase().includes(term) || p.description.toLowerCase().includes(term) || (p.keywords||[]).some(k=>k.includes(term)));
+          renderResults(matches, term);
+        }
+
+        // --- events ---
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('input', performSearch);
+        searchInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ performSearch(); } });
+
+        document.addEventListener('click', (e)=>{
+          if(!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchButton.contains(e.target)){
+            searchResults.classList.remove('active');
+          }
+        });
+
+        searchResults.addEventListener('click', (e)=> e.stopPropagation());
+
+        // --- initialize animations & hover ---
+        carouselSlides.forEach((s,i)=>{ s.classList.add('animate-item'); setTimeout(()=> s.classList.add('is-visible'), 140*i);
+          s.addEventListener('mouseenter', ()=>{ carouselSlides.forEach(o=>{ if(o!==s){ o.style.opacity='0.7'; o.style.transform='scale(0.95)'; }}); });
+          s.addEventListener('mouseleave', ()=>{ if(!searchInput.value.trim()){ carouselSlides.forEach(o=>{ o.style.opacity='1'; o.style.transform='none'; }); } });
+        });
+
+        // --- theme toggle (keep existing behavior) ---
+        const themeToggle = $('#themeToggle');
+        if(themeToggle){
+          const lightIcon = themeToggle.querySelector('.light-icon');
+          const darkIcon = themeToggle.querySelector('.dark-icon');
+          const saved = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', saved);
+          if(lightIcon && darkIcon){ lightIcon.style.display = saved==='dark' ? 'none' : 'inline'; darkIcon.style.display = saved==='dark' ? 'inline' : 'none'; }
+          themeToggle.addEventListener('click', ()=>{
+            const cur = document.documentElement.getAttribute('data-theme') || 'light'; const next = cur==='light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next); localStorage.setItem('theme', next);
+            if(lightIcon && darkIcon){ lightIcon.style.display = next==='dark' ? 'none' : 'inline'; darkIcon.style.display = next==='dark' ? 'inline' : 'none'; }
+          });
+        }
+
+      })();
+
+      
+    </script>
+  </body>
+</html>

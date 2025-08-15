@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Puzzle Challenge</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+                --primary: #4a148c;
+                --secondary: #ff6f00;
+                --accent: #1de9b6;
+                --dark: #1a237e;
+                --background: radial-gradient(circle at top,#0b0220,#000511);
+                --glass-bg: rgba(255, 255, 255, 0.06);
+                --glass-border: rgba(255,255,255,0.08);
+                --text-light: #ffffff;
+            }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+    body { font-family: 'Poppins', sans-serif; min-height:100vh; background:var(--background); color:var(--text-light); display:flex; flex-direction:column; overflow-x:hidden }
+
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: -1;
+            background: 
+                linear-gradient(45deg, var(--primary) 25%, transparent 25%),
+                linear-gradient(-45deg, var(--primary) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, var(--secondary) 75%),
+                linear-gradient(-45deg, transparent 75%, var(--secondary) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+    .game-container { max-width: 1200px; margin: 1.5rem auto; padding:1.25rem }
+
+    .game-header { text-align:center; margin-bottom:2rem }
+
+    .game-title { font-size:2.4rem; margin-bottom:.6rem; background:linear-gradient(45deg,var(--accent),var(--secondary)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent }
+
+    .puzzle-section { display:flex; gap:1.25rem; flex-wrap:wrap; justify-content:center }
+
+    .puzzle-container { flex:1; min-width:260px; max-width:420px; aspect-ratio:1; position:relative }
+
+    .puzzle-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:6px; width:100%; height:100%; background:var(--glass-bg); padding:6px; border-radius:.75rem; opacity:0; transition: opacity .35s ease }
+
+    .puzzle-piece { position:relative; width:100%; aspect-ratio:1; cursor:pointer; transition:transform .25s ease; border-radius:.5rem; overflow:hidden; background-repeat:no-repeat; background-position:center; }
+
+        /* use background-image per tile for exact cropping and fewer <img> elements */
+        .puzzle-piece.empty { background: rgba(0,0,0,0.28); }
+
+        .puzzle-piece:not(.empty):hover { transform: scale(0.97); }
+        
+    .loading, .error { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); padding:1rem 1.5rem; background:var(--glass-bg); border-radius:.6rem; text-align:center; display:flex; flex-direction:column; align-items:center; gap:.5rem }
+
+    /* spinner */
+    .spinner { width:34px; height:34px; border-radius:50%; border:4px solid rgba(255,255,255,0.12); border-top-color:var(--accent); animation:spin 0.9s linear infinite }
+    @keyframes spin { to { transform: rotate(360deg) } }
+        
+        .error {
+            color: #ff4444;
+            background: rgba(255, 0, 0, 0.1);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+    .controls { flex:1; min-width:260px; display:flex; flex-direction:column; gap:1rem }
+
+    /* preview-image removed per user request */
+
+        .moves-counter {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border-radius: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+    .control-button { padding:.9rem 1.6rem; border:none; border-radius:1.25rem; background:linear-gradient(45deg,var(--primary),var(--dark)); color:var(--text-light); font-weight:600; cursor:pointer; transition:transform .25s, box-shadow .25s }
+
+    .control-button:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.28) }
+
+    .win-screen { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:1000 }
+
+    .win-content { background:var(--glass-bg); backdrop-filter:blur(20px); padding:2rem; border-radius:1rem; text-align:center }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .monument-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border-radius: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .monument-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2rem;
+            }
+
+            .puzzle-section {
+                flex-direction: column;
+            }
+
+            .puzzle-container {
+                max-width: none;
+            }
+
+            .controls {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">Heritage Puzzle Challenge</h1>
+            <p class="subtitle">Solve the puzzle to reveal the monument</p>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+                <a class="control-button" href="Hub.html">🎮 Games Hub</a>
+                <a class="control-button" href="index.html">⟵ Back to Home</a>
+            </div>
+        </header>
+
+        <div class="puzzle-section">
+            <div class="puzzle-container">
+                <div class="puzzle-grid" id="puzzleGrid"></div>
+            </div>
+
+            <div class="controls">
+                <div class="moves-counter">Moves: <span id="moveCount">0</span></div>
+                <div class="button-group">
+                    <button class="control-button" onclick="shufflePuzzle()">Shuffle</button>
+                    <button class="control-button" onclick="newPuzzle()">New Puzzle</button>
+                    <button class="control-button" onclick="runSelfCheck()">Self-check</button>
+                </div>
+                <div class="monument-info">
+                    <h3 class="monument-title">Taj Mahal</h3>
+                    <p>One of the seven wonders of the world, the Taj Mahal was built by Emperor Shah Jahan in memory of his beloved wife Mumtaz Mahal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-content">
+            <h2>Congratulations!</h2>
+            <p>You solved the puzzle in <span id="finalMoves">0</span> moves!</p>
+            <button class="control-button" onclick="newPuzzle()">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Debug panel (hidden by default, useful for verifying state) -->
+    <div id="debugPanel" style="position:fixed;right:12px;bottom:12px;background:rgba(0,0,0,0.6);color:#fff;padding:8px;border-radius:8px;font-size:12px;line-height:1.4;display:none;z-index:1200">
+        <div>Empty: <span id="dbgEmpty">-</span></div>
+        <div>Moves: <span id="dbgMoves">0</span></div>
+        <div>State: <span id="dbgState">[]</span></div>
+    </div>
+
+    <script>
+        const puzzleSize = 3;
+        let emptyTile = puzzleSize * puzzleSize - 1;
+        let moves = 0;
+        let currentState = [];
+        let solvedState = [];
+
+        const monuments = [
+            {
+                name: "Taj Mahal",
+                image: "https://images.pexels.com/photos/3881104/pexels-photo-3881104.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1",
+                info: "One of the seven wonders of the world, the Taj Mahal was built by Emperor Shah Jahan in memory of his beloved wife Mumtaz Mahal."
+            },
+            {
+                name: "India Gate",
+                image: "https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&dpr=1",
+                info: "The India Gate is a war memorial located in New Delhi, dedicated to the soldiers of the British Indian Army who died in the First World War."
+            },
+            {
+                name: "Red Fort",
+                image: "https://wanderwisdom.com/.image/c_limit%2Ccs_srgb%2Cq_auto:good%2Cw_700/MjAzNDMwNzE1ODA1NjcyNzk2/fort-agra-easy-peasy.webp",
+                info: "The Red Fort is a historic fortress built in the 17th century by Mughal Emperor Shah Jahan when he decided to shift his capital from Agra to Delhi."
+            },
+            {
+                name: "Kaziranga National Park",
+                image: "https://www.kaziranganationalpark-india.com/blog/wp-content/uploads/2024/02/kaziranga-rhino.jpg",
+                info: "Home to the one-horned rhinoceros and diverse wildlife, Kaziranga is a UNESCO World Heritage Site."
+            }
+        ];
+
+        let currentMonument = 0;
+
+        function initializePuzzle() {
+            const grid = document.getElementById('puzzleGrid');
+            grid.innerHTML = '';
+            moves = 0;
+            updateMoves();
+
+            // Show loading state and load the image
+            grid.style.opacity = '0';
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><div>Loading puzzle...</div></div>';
+            const preloadImage = new Image();
+            preloadImage.onload = () => {
+                // clear loading
+                grid.innerHTML = '';
+                // Create solved state
+                solvedState = Array(puzzleSize * puzzleSize).fill(0).map((_, index) => index);
+                currentState = [...solvedState];
+
+                // Create puzzle pieces as background-image tiles for precise cropping
+                // ensure emptyTile starts at the last position for a fresh puzzle
+                emptyTile = puzzleSize * puzzleSize - 1;
+                for (let i = 0; i < puzzleSize * puzzleSize; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'puzzle-piece';
+                    piece.dataset.tile = i; // original tile index
+                    if (i === emptyTile) {
+                        piece.classList.add('empty');
+                    } else {
+                        const posX = (i % puzzleSize) / (puzzleSize - 1) * 100;
+                        const posY = Math.floor(i / puzzleSize) / (puzzleSize - 1) * 100;
+                        piece.style.backgroundImage = `url('${monuments[currentMonument].image}')`;
+                        piece.style.backgroundSize = `${puzzleSize * 100}% ${puzzleSize * 100}%`;
+                        piece.style.backgroundPosition = `${posX}% ${posY}%`;
+                    }
+                    // attach click handler that computes the element's current position in the grid
+                    piece.addEventListener('click', (e) => {
+                        const pieces = Array.from(grid.querySelectorAll('.puzzle-piece'));
+                        const idx = pieces.indexOf(e.currentTarget);
+                        if (idx >= 0) movePiece(idx);
+                    });
+                    grid.appendChild(piece);
+                }
+
+                shufflePuzzle();
+                updateMonumentInfo();
+                // fade in grid
+                const puzzleGridEl = document.getElementById('puzzleGrid');
+                setTimeout(() => { puzzleGridEl.style.opacity = '1'; }, 20);
+            };
+
+            // Add error handling for image loading
+            preloadImage.onerror = () => {
+                grid.innerHTML = '<div class="error">Failed to load image. Retrying...</div>';
+                currentMonument = (currentMonument + 1) % monuments.length;
+                setTimeout(initializePuzzle, 2000);
+            };
+            // start loading the image
+            preloadImage.src = monuments[currentMonument].image;
+        }
+
+        function updateMonumentInfo() {
+            const monument = monuments[currentMonument];
+            document.querySelector('.monument-title').textContent = monument.name;
+            document.querySelector('.monument-info p').textContent = monument.info;
+        }
+
+        function movePiece(index) {
+            const validMoves = getValidMoves();
+            if (validMoves.includes(index)) {
+                const pieces = document.querySelectorAll('.puzzle-piece');
+                const src = pieces[index];
+                const dest = pieces[emptyTile];
+
+                // swap visual backgrounds and empty class
+                dest.classList.remove('empty');
+                dest.style.backgroundImage = src.style.backgroundImage || '';
+                dest.style.backgroundPosition = src.style.backgroundPosition || '';
+                dest.style.backgroundSize = src.style.backgroundSize || '';
+
+                src.classList.add('empty');
+                src.style.backgroundImage = '';
+                src.style.backgroundPosition = '';
+                src.style.backgroundSize = '';
+
+                // swap dataset.tile (logical tile identifiers)
+                const tmpTile = dest.dataset.tile;
+                dest.dataset.tile = src.dataset.tile;
+                src.dataset.tile = tmpTile;
+
+                // Update state array
+                [currentState[emptyTile], currentState[index]] = [currentState[index], currentState[emptyTile]];
+                emptyTile = index;
+                moves++;
+                updateMoves();
+
+                if (checkWin()) showWinScreen();
+            }
+        }
+
+                // debug helpers
+                function refreshDebug() {
+                    const dbg = document.getElementById('debugPanel');
+                    if (!dbg) return;
+                    document.getElementById('dbgEmpty').textContent = emptyTile;
+                    document.getElementById('dbgMoves').textContent = moves;
+                    document.getElementById('dbgState').textContent = JSON.stringify(currentState);
+                }
+
+                function runSelfCheck() {
+                    const valid = getValidMoves();
+                    if (valid.length > 0) {
+                        movePiece(valid[0]);
+                        refreshDebug();
+                    }
+                }
+
+        function getValidMoves() {
+            const x = emptyTile % puzzleSize;
+            const y = Math.floor(emptyTile / puzzleSize);
+            const moves = [];
+
+            if (x > 0) moves.push(emptyTile - 1); // Left
+            if (x < puzzleSize - 1) moves.push(emptyTile + 1); // Right
+            if (y > 0) moves.push(emptyTile - puzzleSize); // Up
+            if (y < puzzleSize - 1) moves.push(emptyTile + puzzleSize); // Down
+
+            return moves;
+        }
+
+        function shufflePuzzle() {
+            for (let i = 0; i < 200; i++) {
+                const validMoves = getValidMoves();
+                const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+                movePiece(randomMove);
+            }
+            moves = 0;
+            updateMoves();
+        }
+
+        function updateMoves() {
+            document.getElementById('moveCount').textContent = moves;
+        }
+
+        function checkWin() {
+            return currentState.every((value, index) => value === solvedState[index]);
+        }
+
+        function showWinScreen() {
+            document.getElementById('finalMoves').textContent = moves;
+            document.getElementById('winScreen').style.display = 'flex';
+        }
+
+        function newPuzzle() {
+            currentMonument = (currentMonument + 1) % monuments.length;
+            document.getElementById('winScreen').style.display = 'none';
+            initializePuzzle();
+        }
+
+        // Initialize the first puzzle when the page loads
+    window.onload = function(){ initializePuzzle(); setTimeout(() => { document.getElementById('debugPanel').style.display='none'; }, 2000); };
+    </script>
+</body>
+</html>
